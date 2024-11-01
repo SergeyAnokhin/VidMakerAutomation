@@ -1,0 +1,7 @@
+# Requirements for Video Creation Pipeline Project
+# pip install -r ..\requirements.txt
+
+moviepy
+PyYAML
+rich
+icecream
