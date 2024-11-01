@@ -85,12 +85,96 @@ tasks:
       - type: "AudioReaderConverter"
         config:
           start_time: 0
-          end_time: null
+          end_time: null  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
-            height: 720
+            height: 720  # Height of the images to be unified
           transition:
-            fade_in: 1.0
-            fade_out: 1.0
-      - type: "TextOverlayCo
+            fade_in: 1.0  # Fade-in duration in seconds
+            fade_out: 1.0  # Fade-out duration in seconds
+      - type: "TextOverlayConverter"
+        config:
+          text: "Welcome to Our Video"
+          position:
+            x: "50%"  # Position in percentage for horizontal centering
+            y: "90%"  # Position in percentage for vertical placement at the bottom
+          font:
+            name: "Arial"
+            size: 24
+            color: "white"
+          contour:
+            color: "black"
+            size: 2
+          transition:
+            fade_in: 0.5
+            fade_out: 0.5
+      - type: "ImageOverlayConverter"
+        config:
+          image:
+            path: "overlay.png"
+            position:
+              x: "10pt"  # Position in pixels (e.g., '10pt') or percentage (e.g., '10%')
+              y: "20pt"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
+          timing:
+            start_time: 5  # Seconds from the start
+            end_time: 10   # Seconds from the start
+      - type: "SplitConverter"
+        config:
+          parts: 3
+      - type: "AudioVisualizationConverter"
+        config:
+          visualization:
+            bar_count: 30
+            height: 150
+            palette: "COLORMAP_MAGMA"  # OpenCV colormap naming convention
+      - type: "JoinConverter"
+      - type: "AudioReaderConverter"
+        config:
+          start_time: 0
+          end_time: null  # End of the audio, searches for mp3 in directory
+      - type: "VideoExportConverter"
+        config:
+          export:
+            output_path: "output.mp4"
+            fps: 24
+            codec: "libx264"
+            quality_preset: "medium"
+
+  - name: "Create YouTube Short"
+    converters:
+      - type: "AudioReaderConverter"
+        config:
+          start_time: 30
+          end_time: 60  # Duration of 30 seconds
+      - type: "SlideshowCreatorConverter"
+        config:
+          slideshow:
+            height: 1080  # Height for YouTube Short format
+          transition:
+            fade_in: 0.5
+            fade_out: 0.5
+      - type: "TextOverlayConverter"
+        config:
+          text: "Enjoy this Short Clip!"
+          position:
+            x: "50%"  # Position in percentage for horizontal centering
+            y: "50%"  # Position in percentage for vertical centering
+          font:
+            name: "Arial"
+            size: 32
+            color: "yellow"
+          contour:
+            color: "black"
+            size: 2
+          transition:
+            fade_in: 0.5
+            fade_out: 0.5
+      - type: "VideoExportConverter"
+        config:
+          export:
+            output_path: "short_output.mp4"
+            fps: 30
+            codec: "libx264"
+            quality_preset: "high"
+```
