@@ -20,3 +20,9 @@ class BaseConverter(ABC):
         :return: List of processed clips.
         """
         pass
+
+
+# # Add import path fix to ensure that base_converter is importable from submodules
+# import sys
+# import os
+# sys.path.append(os.path.dirname(os.path.abspath(__file__)))

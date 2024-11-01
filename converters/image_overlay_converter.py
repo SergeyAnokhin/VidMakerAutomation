@@ -1,4 +1,4 @@
-from base_converter import BaseConverter
+from .base_converter import BaseConverter
 from moviepy.editor import ImageClip, CompositeVideoClip
 from rich.console import Console
 import os

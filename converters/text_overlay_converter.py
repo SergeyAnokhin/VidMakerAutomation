@@ -1,4 +1,4 @@
-from base_converter import BaseConverter
+from .base_converter import BaseConverter
 from moviepy.editor import TextClip, CompositeVideoClip
 from rich.console import Console
 
@@ -24,6 +24,9 @@ class TextOverlayConverter(BaseConverter):
         fade_in_duration = transition_config.get('fade_in', 0.0)  # Default fade-in to 0.0 seconds
         fade_out_duration = transition_config.get('fade_out', 0.0)  # Default fade-out to 0.0 seconds
 
+        # Log all text properties to console
+        console.print(f"[cyan]Text properties:[/cyan] Text: '{text}', Position: ({position['x']}, {position['y']}), Font: {font['name']}, Size: {font['size']}, Color: {font['color']}, Contour Color: {contour['color']}, Contour Size: {contour['size']}, Fade In: {fade_in_duration}s, Fade Out: {fade_out_duration}s")
+
         text_clip = TextClip(
             text,
             fontsize=font['size'],
@@ -31,7 +34,10 @@ class TextOverlayConverter(BaseConverter):
             font=font['name'],
             stroke_color=contour['color'],
             stroke_width=contour['size']
-        ).set_position((position['x'], position['y'])).fadein(fade_in_duration).fadeout(fade_out_duration)
+        ).set_position((position['x'], position['y'])) \
+        .set_duration(clips[0].duration) \
+        .fadein(fade_in_duration) \
+        .fadeout(fade_out_duration)
 
         updated_clips = []
         for clip in clips:

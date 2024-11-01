@@ -1,4 +1,4 @@
-from base_converter import BaseConverter
+from .base_converter import BaseConverter
 from moviepy.editor import concatenate_videoclips
 from rich.console import Console
 

@@ -1,15 +1,17 @@
 import os
 import yaml
-import AudioReaderConverter
-import AudioVisualizationConverter
-import ImageOverlayConverter
-import SlideshowCreatorConverter
-# from converters import *
+from converters.audio_reader_converter import AudioReaderConverter
 from rich.console import Console
 from icecream import ic
+import traceback
 
-import TextOverlayConverter
-import VideoExportConverter
+from converters.audio_visualization_converter import AudioVisualizationConverter
+from converters.image_overlay_converter import ImageOverlayConverter
+from converters.join_converter import JoinConverter
+from converters.slideshow_creator_converter import SlideshowCreatorConverter
+from converters.split_converter import SplitConverter
+from converters.text_overlay_converter import TextOverlayConverter
+from converters.video_export_converter import VideoExportConverter
 
 console = Console()
 
@@ -62,17 +64,8 @@ def create_converter(converter_type, directory, config):
     return None
 
 if __name__ == "__main__":
-    # Set base directory and configuration file path
+    # Set base directory
     base_directory = '.'
-    config_path = os.path.join(base_directory, 'config.yaml')
-
-    # Load configuration
-    try:
-        config = load_config(config_path)
-        tasks = config.get('tasks', [])
-    except FileNotFoundError:
-        console.print("[red]Configuration file not found. Please provide a valid config.yaml file.[/red]")
-        exit(1)
 
     # Get directories to process
     clip_directories = get_clip_directories(base_directory)
@@ -93,3 +86,4 @@ if __name__ == "__main__":
                 console.print(f"[red]No config.yaml found in directory {directory}. Skipping...[/red]")
         except Exception as e:
             console.print(f"[red]Error processing directory {directory}: {str(e)}[/red]")
+            console.print(f"[red]{traceback.format_exc()}[/red]")

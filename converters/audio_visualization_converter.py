@@ -1,4 +1,4 @@
-from base_converter import BaseConverter
+from .base_converter import BaseConverter
 from moviepy.editor import AudioFileClip, CompositeVideoClip
 from moviepy.video.fx.all import colorx
 from rich.console import Console
