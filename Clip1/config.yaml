@@ -12,11 +12,12 @@ tasks:
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
-            height: 512  # Height of the images to be unified
-            duration: 2
+            height: 256  # Height of the images to be unified
+            duration: 10
           transition:
             fade_in: 0.5  # Fade-in duration in seconds
             fade_out: 0.5  # Fade-out duration in seconds
+            fade_in_first_image: false
       # - type: "TextOverlayConverter"
       #   config:
       #     text: "Welcome to Our Video"
