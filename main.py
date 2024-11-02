@@ -11,6 +11,7 @@ from converters.join_converter import JoinConverter
 from converters.slideshow_creator_converter import SlideshowCreatorConverter
 from converters.split_converter import SplitConverter
 from converters.text_overlay_converter import TextOverlayConverter
+from converters.two_basses_visualization_convertor import TwoSpotsVisualizationConverter
 from converters.video_export_converter import VideoExportConverter
 
 console = Console()
@@ -55,6 +56,7 @@ def create_converter(converter_type, directory, config):
         "ImageOverlayConverter": ImageOverlayConverter,
         "SplitConverter": SplitConverter,
         "AudioVisualizationConverter": AudioVisualizationConverter,
+        "TwoSpotsVisualizationConverter": TwoSpotsVisualizationConverter,
         "JoinConverter": JoinConverter,
         "VideoExportConverter": VideoExportConverter,
     }

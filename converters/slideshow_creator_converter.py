@@ -1,7 +1,7 @@
 import pprint
 import tool
 from .base_converter import BaseConverter
-from moviepy.editor import ImageClip, CompositeVideoClip, concatenate_videoclips
+from moviepy.editor import ImageClip, CompositeVideoClip, concatenate_videoclips, VideoClip
 from rich.console import Console
 from rich.table import Table
 import os
@@ -10,7 +10,7 @@ import time
 console = Console()
 
 class SlideshowCreatorConverter(BaseConverter):
-    def convert(self, clip, metadata):
+    def convert(self, clip: VideoClip, metadata):
         """
         Creates a slideshow from images in the directory and adds it to the clip.
         If no clip is provided, creates a new video clip from the images.
@@ -42,7 +42,6 @@ class SlideshowCreatorConverter(BaseConverter):
         # Process images to generate clips
         image_clips = self._process_images(image_files, duration_per_image, total_duration)
 
-        pprint.pprint(image_clips)
         slideshow = concatenate_videoclips(image_clips, method="compose")
         console.print("[bold blue]✅ Slideshow created successfully.[/bold blue]")
 
@@ -95,7 +94,7 @@ class SlideshowCreatorConverter(BaseConverter):
         # Cycle through images repeatedly until the total duration is reached
         while start_time < total_duration:
             for image_file in image_files:
-                console.print(f"[cyan]🔂 Loop:{start_time} -> {total_duration} [/cyan]")
+                # console.print(f"[cyan]🔂 Loop:{start_time} -> {total_duration} [/cyan]")
                 if start_time >= total_duration:
                     break
                     # console.print(table)
