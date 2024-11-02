@@ -42,7 +42,7 @@ def process_directory(directory, tasks):
             converter = create_converter(converter_type, directory, config)
 
             if converter:
-                clips = converter.convert(clips, metadata)
+                clips = converter.process(clips, metadata)
             else:
                 console.print(f"[red]Unknown converter type: {converter_type}[/red]")
 
@@ -70,12 +70,12 @@ if __name__ == "__main__":
     # Get directories to process
     clip_directories = get_clip_directories(base_directory)
     if not clip_directories:
-        console.print("[yellow]No clip directories found.[/yellow]")
+        console.print(f"[yellow]No clip directories found in {base_directory}.[/yellow]")
         exit(1)
 
     # Process each directory
     for directory in clip_directories:
-        console.rule(f"Processing Directory: {directory}")
+        console.rule(f"Processing Directory: {directory}", characters="=")
         try:
             config_path = os.path.join(directory, 'config.yaml')
             if os.path.exists(config_path):

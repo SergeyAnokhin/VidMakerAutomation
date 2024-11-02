@@ -162,3 +162,4 @@ cython_debug/
 #.idea/
 
 /Clip*/*.mp4
+/Clip1/desktop.ini

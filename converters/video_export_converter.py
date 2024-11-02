@@ -1,22 +1,18 @@
 from .base_converter import BaseConverter
 from moviepy.editor import CompositeVideoClip
-from rich.console import Console
 import os
-
-console = Console()
+import time
 
 class VideoExportConverter(BaseConverter):
-    def convert(self, clips, metadata):
+    def convert(self, clip, metadata):
         """
         Exports the final video clip to a file.
-        If no clips are provided, raises an error.
+        If no clip is provided, raises an error.
         """
-        if not clips:
-            console.print(f"[red]No existing clips found. Cannot export video without clips.[/red]")
-            raise ValueError("No existing clips found to export.")
+        if clip is None:
+            raise ValueError("No clip provided for export.")
 
-        console.print(f"[bold blue]Processing Video Export:[/bold blue] Exporting final video")
-        # Search for an mp3 file in the directory and use its name for the output file
+        # Search for an mp3 file in the directory to determine the output file name
         audio_file = None
         for file in os.listdir(self.directory):
             if file.endswith('.mp3'):
@@ -24,16 +20,23 @@ class VideoExportConverter(BaseConverter):
                 break
 
         if audio_file is None:
-            console.print(f"[red]No mp3 file found in directory: {self.directory}. Cannot determine output file name.[/red]")
-            raise FileNotFoundError("No mp3 file found in directory.")
+            raise FileNotFoundError(f"No mp3 file found in directory: {self.directory}. Cannot determine output file name.")
 
         output_path = os.path.join(self.directory, f"{audio_file}.mp4")
+
+        # If the output file already exists, append a random timestamp to the file name
+        if os.path.exists(output_path):
+            timestamp = time.strftime("%H_%M_%S", time.localtime())
+            output_path = os.path.join(self.directory, f"{audio_file}_{timestamp}.mp4")
+
         fps = self.config.get('export', {}).get('fps', 24)  # Default FPS to 24
         codec = self.config.get('export', {}).get('codec', 'libx264')  # Default codec to 'libx264'
         quality_preset = self.config.get('export', {}).get('quality_preset', 'medium')  # Default quality preset
 
-        final_clip = CompositeVideoClip(clips)
-        console.print(f"[green]Exporting video to {output_path} with FPS: {fps}, Codec: {codec}, Quality: {quality_preset} 🎬✨[/green]")
-        final_clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset)
+        # Log exporting details
+        print(f"Exporting video to {output_path} with FPS: {fps}, Codec: {codec}, Quality: {quality_preset}")
 
-        return clips
+        # Export the video clip
+        clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset)
+
+        return clip
