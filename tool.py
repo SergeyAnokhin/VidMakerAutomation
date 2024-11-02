@@ -11,7 +11,7 @@ def log_execution_time(start_time, message_prefix="Processing completed in"):
     """
     end_time = time.time()
     elapsed_time = end_time - start_time
-    console.print(f"[green]{message_prefix} {int(elapsed_time // 60)}:{int(elapsed_time % 60):02d}[/green]")
+    console.print(f"[green]{message_prefix} {transform_to_MMSS(elapsed_time)}[/green]")
 
 def log_clip_conversion(converter_name):
     """
@@ -19,3 +19,12 @@ def log_clip_conversion(converter_name):
     :param converter_name: The name of the converter.
     """
     console.print(f"[cyan]Converting clip using {converter_name}...[/cyan]")
+
+
+
+
+def transform_to_MMSS(seconds: int) -> str:
+    return time.strftime('%M:%S', time.gmtime(seconds))
+
+# def transform_to_MMSS(seconds: int) -> str:
+#     return f"{int(seconds // 60)}:{int(seconds % 60):02d}"

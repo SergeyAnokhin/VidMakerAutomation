@@ -6,6 +6,8 @@ import time
 console = Console()
 
 class BaseConverter(ABC):
+    config = {}
+    
     def __init__(self, directory, config):
         """
         Initialize the base converter with directory and configuration settings.
@@ -13,7 +15,7 @@ class BaseConverter(ABC):
         :param config: Configuration settings for the converter.
         """
         self.directory = directory
-        self.config = config
+        self.config = config or {}
 
     @abstractmethod
     def convert(self, clip, metadata):

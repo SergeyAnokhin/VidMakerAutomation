@@ -1,39 +1,48 @@
+import tool
 from .base_converter import BaseConverter
 from moviepy.editor import AudioFileClip, ColorClip
+from rich.console import Console
 import os
-import time
+
+console = Console()
 
 class AudioReaderConverter(BaseConverter):
     def convert(self, clip, metadata):
         """
-        Reads an audio file from the directory and returns it as an audio clip.
-        If an audio clip already exists, replaces the audio track with the new one.
-        If no clip is provided, creates a new video clip with a solid color and adds the audio to it.
+        Reads an audio file from the directory and adds it to the clip.
+        If no clip is provided, creates a new audio clip from the audio file.
         """
-        audio_file = None
-        for file in os.listdir(self.directory):
-            if file.endswith('.mp3'):
-                audio_file = os.path.join(self.directory, file)
-                break
+        console.print("[bold blue]🎵 Starting Audio Reading...[/bold blue]")
+        audio_files = [
+            os.path.join(self.directory, f) for f in os.listdir(self.directory)
+            if f.lower().endswith(('.mp3', '.wav', '.aac'))
+        ]
 
-        if audio_file is None:
-            raise FileNotFoundError(f"No mp3 file found in directory: {self.directory}")
+        if not audio_files:
+            console.print(f"[red]❌ No audio files found in directory: {self.directory}[/red]")
+            raise FileNotFoundError(f"No audio files found in directory: {self.directory}")
 
-        start_time = self.config.get('start_time', None)
+        if len(audio_files) > 1:
+            console.print(f"[yellow]⚠️ Multiple audio files found in directory: {self.directory}. Using the first one found.[/yellow]")
+
+        audio_file = audio_files[0]
+        
+        start_time = self.config.get('start_time', 0)
         end_time = self.config.get('end_time', None)
 
         # Load audio with start and end times if specified
-        if start_time is not None or end_time is not None:
+        if start_time != 0 or end_time is not None:
+            console.print(f"[cyan]✂️ Cropping audio from {start_time} to {end_time} seconds[/cyan]")
             audio_clip = AudioFileClip(audio_file).subclip(start_time, end_time)
         else:
             audio_clip = AudioFileClip(audio_file)
 
-        # If clip is None, create a new one
+        console.print(f"[cyan]🔊 Audio file loaded: {audio_file} with duration {tool.transform_to_MMSS(audio_clip.duration)} seconds[/cyan]")
+
         if clip is None:
-            new_clip = ColorClip(size=(640, 480), color=(0, 0, 0), duration=audio_clip.duration)
-            new_clip = new_clip.set_audio(audio_clip)
-            return new_clip
+            console.print("[yellow]⚠️ No existing video clip provided. Returning audio as new clip.[/yellow]")
+            clip = ColorClip(size=(1024, 1024), color=(0, 0, 0), duration=audio_clip.duration)
         else:
-            # Add audio to the existing clip
-            updated_clip = clip.set_audio(audio_clip)
-            return updated_clip
+            console.print("[green]🛠️ Adding audio to existing video clip.[/green]")
+
+        return clip.set_audio(audio_clip)
