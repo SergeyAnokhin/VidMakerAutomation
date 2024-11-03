@@ -163,3 +163,4 @@ cython_debug/
 
 /Clip*/*.mp4
 /Clip1/desktop.ini
+/Clip*/log_*

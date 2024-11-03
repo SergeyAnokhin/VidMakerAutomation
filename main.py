@@ -36,7 +36,7 @@ def process_directory(directory, tasks):
         converters = task.get('converters', [])
         clips = []
         metadata = {}
-        logger = HierarchicalLogger()
+        logger = HierarchicalLogger(directory=directory)
 
 
         for converter_data in converters:

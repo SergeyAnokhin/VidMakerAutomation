@@ -2,6 +2,7 @@ import tool
 from .base_converter import BaseConverter
 from moviepy.editor import *
 from rich.console import Console
+from rich.table import Table
 import numpy as np
 import cv2
 import librosa
@@ -44,24 +45,10 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # return updated_clips
         
             
-        # Создаем эквалайзерный клип
-        # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
-        frequency_bands = [
-            {'band': (20, 80), 'amplification': 1.0},
-            {'band': (80, 255), 'amplification': 14.0}, # humain voice band
-            {'band': (255, 500), 'amplification': 3.0},
-            {'band': (500, 8000), 'amplification': 20.0},
-        ]
+
         # all color maps : https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-        equalizer_clip = self.create_equalizer_clip(clip, 
-                            colormap=colormap, circle_radius=300,
-                            center_dot_size=35, edge_dot_size=5,
-                            colormap_positions=[0.0, 0.33, 0.66, 1.0],
-                            num_dots=30,
-                            circle_vertical_position_percent=7,
-                            amplitude_threshold=0.6,
-                            debug_mode=False, fps=fps,
-                            frequency_bands=frequency_bands)        
+        equalizer_clip = self.create_equalizer_clip(clip, size=clip.size,
+                            colormap=colormap, debug_mode=False, fps=fps)        
 
         # Делаем фон прозрачным (удаляем определенный цвет)
         equalizer_clip = equalizer_clip.fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5) # thr=100, s=5
@@ -90,7 +77,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
             self.log.log(f"Audio duration: {tool.transform_to_MMSS(clip.audio.duration)}")        
         
         # Use specified sample rate or default to 44100 Hz
-        sample_rate = sr if sr else 48000
+        sample_rate = sr if sr else 10000
         
         # Extract audio as a NumPy array with the specified sample rate
         audio_data = clip.audio.to_soundarray(fps=sample_rate)
@@ -98,11 +85,13 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Extract the audio as a list of samples
         clip.audio.fps = sample_rate
         audio_samples = list(clip.audio.iter_frames())
+        self.log.log(f"[grey]🎵 Setting audio sample rate: {sample_rate} Hz. 📊 Got {len(audio_samples)} audio samples[/grey]")
 
         # Convert the list of samples to a NumPy array
         audio_data = np.array(audio_samples)
-        print(audio_data)
-        print(audio_data.shape)
+        self.log.log(f"[grey]🔊 Converting audio samples to NumPy array with shape {audio_data.shape}[/grey]")
+        # print(audio_data)
+        # print(audio_data.shape)
         
         # print("----------------")
         # y, sr = librosa.load("Clip1/The Laughing Heart #6.mp3", sr=None, mono=False)
@@ -116,33 +105,76 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # sreturn y, sr
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
-    def create_equalizer_clip(self, clip: VideoClip, fps=24, size=(1024, 1024),
-                            colormap=cv2.COLORMAP_JET, circle_radius=None,
-                            center_dot_size=15, edge_dot_size=5,
-                            colormap_positions=[0.0, 0.33, 0.66, 1.0],
-                            num_dots=10,
-                            circle_vertical_position_percent=10,
-                            amplitude_threshold=0.05,
-                            frequency_bands=None,
+    def create_equalizer_clip(self, clip: VideoClip, fps, size, colormap=cv2.COLORMAP_JET,
                             debug_mode=False):
+        
+        # circle_radius=300,
+        # center_dot_size=15, edge_dot_size=5,
+        # num_dots=10,
+        # circle_vertical_position_percent=10,
+        # amplitude_threshold=0.05,
+        # frequency_bands=None,
+
         duration = clip.duration   
         size = clip.size
-        circle_radius = size[1] * 0.3
-    
-        if frequency_bands is None:
-            frequency_bands = [
-                {'band': (20, 150), 'amplification': 1.0},
-                {'band': (150, 500), 'amplification': 1.0},
-                {'band': (500, 2000), 'amplification': 1.0},
-                {'band': (2000, 8000), 'amplification': 1.0},
-            ]
+        circle_radius = size[1] * 0.25
+        colormap_positions=[0.0, 0.33, 0.66, 1.0]
+        center_dot_size=35
+        edge_dot_size=5
+        num_dots=30
+        circle_vertical_position_percent=7
+        amplitude_threshold=0.6
+
+        # Log visualization parameters
+        table = Table(title="🎨 Visualization Parameters")
+        table.add_column("📊 Parameter", justify="right")
+        table.add_column("Value", justify="left") 
+        table.add_column("📊 Parameter", justify="right")
+        table.add_column("Value", justify="left")
+        params = [
+            ("⏱️ Duration", f"{duration:.2f} s", "🎯 Circle Radius", f"{circle_radius:.0f} px"),
+            ("📐 Size", f"↔{size[0]} ↕{size[1]} px", "🎨 Colormap", tool.get_colormap_name(colormap)),
+            ("⚪ Center Dot", str(center_dot_size), "⭕ Edge Dot", str(edge_dot_size)),
+            ("🔢 Num Dots", str(num_dots), "📍 Circle Y Pos", f"{circle_vertical_position_percent}%"),
+            ("📊 Amplitude", str(amplitude_threshold), "🎞️ FPS", str(fps)),
+            ("🎨 Colors", str(colormap_positions), "", "")
+        ]
+        for row_params in params:
+            table.add_row(*row_params)
+        self.log.print(table)
+
+        # Создаем эквалайзерный клип
+        # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
+        frequency_bands = [
+            {'band': (20, 80), 'amplification': 1.0},
+            {'band': (80, 255), 'amplification': 1.0}, # humain voice band
+            {'band': (255, 500), 'amplification': 1.0},
+            {'band': (500, 8000), 'amplification': 1.0},
+        ]
         # Load audio file
         # y, sr = librosa.load(audio_file, sr=None, mono=False)
         y, sr = self.load_audio_from_videoclip(clip, fps)
 
         self.log.log(f"[grey]🎨Used colormap: {tool.get_colormap_name(colormap)}[/grey]")        
         self.log.log(f"[grey]🔊Used frequency bands: [/grey]")        
-        self.log.print(frequency_bands)        
+        table = Table()
+        table.add_column("↔Range", justify="center")
+        table.add_column("⏫Amplification", justify="center") 
+        table.add_column("↔Range", justify="center")
+        table.add_column("⏫Amplification", justify="center")
+        table.add_row(
+            f"{frequency_bands[0]['band'][0]}-{frequency_bands[0]['band'][1]} Hz",
+            str(frequency_bands[0].get('amplification', 1.0)),
+            f"{frequency_bands[1]['band'][0]}-{frequency_bands[1]['band'][1]} Hz", 
+            str(frequency_bands[1].get('amplification', 1.0))
+        )
+        table.add_row(
+            f"{frequency_bands[2]['band'][0]}-{frequency_bands[2]['band'][1]} Hz",
+            str(frequency_bands[2].get('amplification', 1.0)),
+            f"{frequency_bands[3]['band'][0]}-{frequency_bands[3]['band'][1]} Hz",
+            str(frequency_bands[3].get('amplification', 1.0))
+        )
+        self.log.print(table)
 
         # Ensure audio is stereo
         if y.ndim == 1:
@@ -387,7 +419,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Загружаем аудио файл
         y, sr = librosa.load(audio_file, sr=None, mono=False)
 
-        # Убедимся, что аудио стерео
+        # Убедимя, что аудио стерео
         if y.ndim == 1:
             y = np.array([y, y])
 
@@ -433,7 +465,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         equalizer_width = int(size[0] * (equalizer_width_percent / 100))  # Ширина каждого эквалайзера
         bar_width = equalizer_width // num_bars  # Ширина одного столбика
 
-        # Максимальная высота столбика в пикселях
+        # Мксимальная высота столбика в пикселях
         max_bar_height = int(size[1] * (max_bar_height_percent / 100))
 
         # Начальные позиции для левого и правого эквалайзеров

@@ -2,13 +2,16 @@
 
 # List of tasks to be executed for the directory
 # Each task has a set of converters that are applied in sequence
+
+fps: &default_fps 24  
+
 tasks:
   - name: "Create Full Length Video"
     converters:
       - type: "AudioReaderConverter"
         config:
           start_time: 0
-          end_time: 10  # End of the audio
+          end_time: 20  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
@@ -50,7 +53,7 @@ tasks:
       - type: "TwoSpotsVisualizationConverter"
         config:
           visualization:
-            fps: 60
+            fps: *default_fps
             colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
       # - type: "JoinConverter"
       # - type: "AudioReaderConverter"
@@ -61,7 +64,7 @@ tasks:
         config:
           export:
             output_path: "output.mp4"
-            fps: 60
+            fps: *default_fps
             codec: "libx264"
             quality_preset: "medium"
 
