@@ -117,12 +117,55 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         duration = clip.duration   
         size = clip.size
+        # Radius of the visualization circle, set to 25% of video height
+        # Example for 1080p video:
+        #  ___________1920px____________
+        # |                             |
+        # |          ○ <-270px radius   | 1080px 
+        # |         /|\                 |
+        # |                             |
+        # |_____________________________|
         circle_radius = size[1] * 0.25
+
+        # Positions for color transitions in the colormap (0.0=start color, 1.0=end color)
+        # Example:
+        # [0.0]    [0.33]    [0.66]    [1.0]
+        #  blue -> yellow -> orange ->  red
         colormap_positions=[0.0, 0.33, 0.66, 1.0]
+
+        # Size in pixels of the center dot that shows the main beat
+        # Example:
+        #    ___35px___
+        #   /     ○    \  <- Center dot expands/contracts with beat
+        #  |   ●●●●●●   | 
+        #   \__________/
         center_dot_size=35
-        edge_dot_size=5
+
+        # Size in pixels of the smaller dots around the circle edge
+        # Example:
+        #      ○        
+        #   •       •    <- 5px dots
+        #      ○
+        edge_dot_size=3
+
+        # Number of dots to display around the circle
+        # Example:
+        #      • • •      
+        #    •       •    <- 30 dots total
+        #  •           •
+        #    •       •
+        #      • • •
         num_dots=30
+
+        # Vertical position of circle center as percentage from top of frame
+        # Example for 7%:
+        # ___________________
+        #      ○  <- 7% from top
+        # |           |
+        # |           |
+        # |___________|
         circle_vertical_position_percent=7
+        # Threshold for audio amplitude to trigger visualization (0.0-1.0)
         amplitude_threshold=0.6
 
         # Log visualization parameters
