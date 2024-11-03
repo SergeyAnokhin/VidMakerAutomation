@@ -36,6 +36,8 @@ class VideoExportConverter(BaseConverter):
         # Log exporting details
         self.log.log(f"[green]Exporting video to {output_path} with FPS: {fps}, Codec: {codec}, Quality: {quality_preset}[/green]")
 
+        # clip = CompositeVideoClip([clip, metadata['right'], metadata['left']])
+
         # Export the video clip
         clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset, threads=4)
 

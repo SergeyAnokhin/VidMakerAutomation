@@ -3,6 +3,7 @@ from moviepy.editor import ImageClip, CompositeVideoClip, VideoFileClip
 from moviepy.video.fx import all as vfx
 from rich.console import Console
 import os
+import tool
 
 console = Console()
 
@@ -32,6 +33,7 @@ class ImageOverlayConverter(BaseConverter):
             gif_file=image_path,
             audio_duration=clip.duration,
             slideshow=clip,
+            metadata=metadata,  
             resize=resize,
             start_time=start_time,
             duration=duration,
@@ -40,10 +42,12 @@ class ImageOverlayConverter(BaseConverter):
 
         return updated_clip
 
-    def add_gif(self, gif_file, audio_duration, slideshow, resize=1, start_time=-32, duration=None, position=None):
+    def add_gif(self, gif_file, audio_duration, slideshow, metadata, resize=1, start_time=-32, duration=None, position=None):
         if not gif_file or not os.path.isfile(gif_file):
             return slideshow
             
+        tool.inspect_clip("slideshow", slideshow, self.log)
+
         has_mask = False
         
         if duration is None:
@@ -80,7 +84,15 @@ class ImageOverlayConverter(BaseConverter):
             .with_start(start_time)
         )
 
+        tool.inspect_clip("gif_clip", gif_clip, self.log)   
+
         self.log.log(f"GIF: Duration: {start_time:3.0f} -> {start_time + duration:3.0f} secs")
+        # gif_clip = gif_clip.mask_color(color=[0, 0, 0], threshold=100, stiffness=5)
         gif_clip = gif_clip.fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5)
-        final_video = CompositeVideoClip([slideshow, gif_clip])
+        tool.inspect_clip("gif_clip", gif_clip, self.log)   
+        
+        self.log.log(f"Adding gif_clip to metadata: {position[0]}")
+        metadata[position[0]] = gif_clip
+        final_video = slideshow # CompositeVideoClip([slideshow, gif_clip])
+        tool.inspect_clip("final_video", final_video, self.log)   
         return final_video

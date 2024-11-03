@@ -44,17 +44,23 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         #     updated_clips.append(CompositeVideoClip([clip, visualization_clip.set_duration(clip.duration)]))
         # return updated_clips
         
-            
+        tool.inspect_clip("clip", clip, self.log)
 
         # all color maps : https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
         equalizer_clip = self.create_equalizer_clip(clip, size=clip.size,
                             colormap=colormap, debug_mode=False, fps=fps)        
+        tool.inspect_clip("equalizer_clip", equalizer_clip, self.log)
 
         # Делаем фон прозрачным (удаляем определенный цвет)
         equalizer_clip = equalizer_clip.fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5) # thr=100, s=5
+        tool.inspect_clip("equalizer_clip", equalizer_clip, self.log)
+        # equalizer_clip = equalizer_clip.mask_color(color=[0, 0, 0], threshold=100, stiffness=5) # thr=100, s=5
         equalizer_clip = equalizer_clip.with_opacity(0.2)  # Опционально: установить прозрачность
+        tool.inspect_clip("equalizer_clip", equalizer_clip, self.log)
+
         clip = CompositeVideoClip([clip, equalizer_clip])
-        
+        tool.inspect_clip("clip", clip, self.log)
+
         return clip
     
     def load_audio_from_videoclip(self, clip: VideoClip, fps=24, sr=None):

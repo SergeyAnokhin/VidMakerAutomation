@@ -11,7 +11,7 @@ tasks:
       - type: "AudioReaderConverter"
         config:
           start_time: 0
-          end_time: 60  # End of the audio
+          end_time: 10  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
@@ -37,25 +37,36 @@ tasks:
       #     transition:
       #       fade_in: 0.5
       #       fade_out: 0.5
-      - type: "ImageOverlayConverter"
-        config:
-          image:
-            path: "static/animated2.gif"
-            resize: 1
-            position:
-              x: "left"  # Position in pixels (e.g., '10pt') or percentage (e.g., '10%')
-              y: "bottom"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
-          timing:
-            start_time: -32  
-            # duration: 10   
-      # - type: "SplitConverter"
-      #   config:
-      #     parts: 3
       # - type: "TwoSpotsVisualizationConverter"
       #   config:
       #     visualization:
       #       fps: *default_fps
       #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
+      # - type: "ImageOverlayConverter"
+      #   config:
+      #     image:
+      #       path: "static/animated2.gif"
+      #       resize: 0.5
+      #       position:
+      #         x: "right"  # Position in pixels (e.g., '10pt') or percentage (e.g., '10%')
+      #         y: "bottom"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
+      #     timing:
+      #       start_time: -9
+      #       duration: 4
+      # - type: "ImageOverlayConverter"
+      #   config:
+      #     image:
+      #       path: "static/animated2.gif"
+      #       resize: 0.5
+      #       position:
+      #         x: "left"  # Position in pixels (e.g., '10pt') or percentage (e.g., '10%')
+      #         y: "bottom"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
+      #     timing:
+      #       start_time: -9
+      #       duration: 4
+      # - type: "SplitConverter"
+      #   config:
+      #     parts: 3
       # - type: "JoinConverter"
       # - type: "AudioReaderConverter"
       #   config:
