@@ -47,10 +47,10 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Создаем эквалайзерный клип
         # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
         frequency_bands = [
-            {'band': (20, 80), 'amplification': 2.0},
+            {'band': (20, 80), 'amplification': 1.0},
             {'band': (80, 255), 'amplification': 14.0}, # humain voice band
             {'band': (255, 500), 'amplification': 3.0},
-            {'band': (500, 8000), 'amplification': 40.0},
+            {'band': (500, 8000), 'amplification': 20.0},
         ]
         # all color maps : https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
         equalizer_clip = self.create_equalizer_clip(clip, 
@@ -64,8 +64,8 @@ class TwoSpotsVisualizationConverter(BaseConverter):
                             frequency_bands=frequency_bands)        
 
         # Делаем фон прозрачным (удаляем определенный цвет)
-        equalizer_clip = equalizer_clip.fx(vfx.mask_color, color=[0, 0, 0], thr=100, s=5)   
-        equalizer_clip = equalizer_clip.set_opacity(0.2)  # Опционально: установить прозрачность
+        equalizer_clip = equalizer_clip.fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5) # thr=100, s=5
+        equalizer_clip = equalizer_clip.with_opacity(0.2)  # Опционально: установить прозрачность
         clip = CompositeVideoClip([clip, equalizer_clip])
         
         return clip
@@ -95,24 +95,25 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Extract audio as a NumPy array with the specified sample rate
         audio_data = clip.audio.to_soundarray(fps=sample_rate)
         
-        # # Extract the audio as a list of samples
-        # clip.audio.fps = sample_rate
-        # audio_samples = list(clip.audio.iter_frames())
+        # Extract the audio as a list of samples
+        clip.audio.fps = sample_rate
+        audio_samples = list(clip.audio.iter_frames())
 
-        # # Convert the list of samples to a NumPy array
-        # audio_data = np.array(audio_samples)
-        # print(audio_data)
-        # print(audio_data.shape)
+        # Convert the list of samples to a NumPy array
+        audio_data = np.array(audio_samples)
+        print(audio_data)
+        print(audio_data.shape)
         
         # print("----------------")
-        y, sr = librosa.load("Clip1/The Laughing Heart #6.mp3", sr=None, mono=False)
+        # y, sr = librosa.load("Clip1/The Laughing Heart #6.mp3", sr=None, mono=False)
         # print(y)
+        # print(sr)
         # print(y.shape)
         
         # raise ValueError("STOP!")
         
-        #return audio_data, sample_rate    
-        return y, sr
+        return audio_data.T, sample_rate    
+        # sreturn y, sr
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
     def create_equalizer_clip(self, clip: VideoClip, fps=24, size=(1024, 1024),
@@ -138,6 +139,10 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Load audio file
         # y, sr = librosa.load(audio_file, sr=None, mono=False)
         y, sr = self.load_audio_from_videoclip(clip, fps)
+
+        self.log.log(f"[grey]🎨Used colormap: {tool.get_colormap_name(colormap)}[/grey]")        
+        self.log.log(f"[grey]🔊Used frequency bands: [/grey]")        
+        self.log.print(frequency_bands)        
 
         # Ensure audio is stereo
         if y.ndim == 1:
@@ -348,7 +353,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
             return frame
 
         # Create video clip for the frame
-        equalizer_clip = VideoClip(make_frame, duration=duration).set_fps(fps)
+        equalizer_clip = VideoClip(make_frame, duration=duration).with_fps(fps)
 
         # get_max_dot_sizes_per_band(debug_info, len(frequency_bands))
 

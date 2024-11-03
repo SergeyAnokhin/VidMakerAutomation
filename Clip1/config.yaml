@@ -51,7 +51,7 @@ tasks:
         config:
           visualization:
             fps: 60
-            palette: "COLORMAP_AUTUMN"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
+            colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
       # - type: "JoinConverter"
       # - type: "AudioReaderConverter"
       #   config:

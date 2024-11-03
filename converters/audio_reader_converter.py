@@ -45,4 +45,4 @@ class AudioReaderConverter(BaseConverter):
         else:
             self.log.log("[green]🛠️ Adding audio to existing video clip.[/green]")
 
-        return clip.set_audio(audio_clip)
+        return clip.with_audio(audio_clip)
