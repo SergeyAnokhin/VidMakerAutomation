@@ -3,19 +3,19 @@
 # List of tasks to be executed for the directory
 # Each task has a set of converters that are applied in sequence
 
-fps: &default_fps 24  
+fps: &default_fps 60 
 
 tasks:
   - name: "Create Full Length Video"
     converters:
       - type: "AudioReaderConverter"
         config:
-          start_time: 0
-          end_time: 20  # End of the audio
+          # start_time: 0
+          # end_time: 20  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
-            height: 256  # Height of the images to be unified
+            height: 1024  # Height of the images to be unified
             duration: 10
           transition:
             fade_in: 0.5  # Fade-in duration in seconds
