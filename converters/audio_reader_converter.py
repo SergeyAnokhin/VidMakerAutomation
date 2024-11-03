@@ -49,7 +49,10 @@ class AudioReaderConverter(BaseConverter):
         else:
             self.log.log("[green]🛠️ Adding audio to existing video clip.[/green]")
 
-        return clip.with_audio(audio_clip)
+        clip = clip.set_audio(audio_clip)
+        metadata["audio_file"] = audio_file
+
+        return clip
 
 
     def suggest_frequency_bands(self, 

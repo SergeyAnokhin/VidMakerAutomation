@@ -27,7 +27,7 @@ colormap_names = {
 def get_colormap_name(code):
     return colormap_names.get(code, "Unknown colormap")
 
-def inspect_clip(name, clip, log, debug=True):
+def inspect_clip(name, clip, log, debug=False):
     if not debug:
         return
 

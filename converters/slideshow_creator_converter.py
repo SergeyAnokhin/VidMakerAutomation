@@ -57,7 +57,7 @@ class SlideshowCreatorConverter(BaseConverter):
             resized_clip_size = (clip.w, clip.h)
             self.log.log(f"[yellow]🔄 Resizing and cropping incoming clip from {original_clip_size} to {resized_clip_size} pixels[/yellow]")
 
-        updated_clip = CompositeVideoClip([clip, slideshow.with_duration(clip.duration)])
+        updated_clip = CompositeVideoClip([clip, slideshow.set_duration(clip.duration)])
         self.log.log("[bold blue]🎉 Slideshow added to existing clip successfully.[/bold blue]")
         return updated_clip
 
@@ -114,7 +114,7 @@ class SlideshowCreatorConverter(BaseConverter):
                 # Determine if the image fits within the total duration
                 if start_time + duration_per_image <= total_duration:
                     # Image fits within the total duration
-                    image_clip = image_clip.with_duration(duration_per_image)
+                    image_clip = image_clip.set_duration(duration_per_image)
                     if index == 1 and not fade_in_first_image:
                         image_clip = image_clip.fadeout(fade_out_duration)
                     else:

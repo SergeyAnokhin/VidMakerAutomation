@@ -16,11 +16,11 @@ def create_video_with_gifsOK(background_path, gif_path, duration=5):
     background_clip = VideoFileClip(background_path).set_duration(duration)
 
     # Загружаем первый GIF и делаем чёрный цвет прозрачным
-    gif1 = VideoFileClip(gif_path).set_duration(duration).fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5)
+    gif1 = VideoFileClip(gif_path).set_duration(duration).fx(vfx.mask_color, color=[0, 0, 0], thr=100, s=5)
     gif1 = gif1.set_position(("center", "top"))  # Позиционируем первый GIF в нужном месте
 
     # Загружаем второй GIF и также делаем чёрный цвет прозрачным
-    gif2 = VideoFileClip(gif_path).set_duration(duration).fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5)
+    gif2 = VideoFileClip(gif_path).set_duration(duration).fx(vfx.mask_color, color=[0, 0, 0], thr=100, s=5)
     gif2 = gif2.set_position(("center", "bottom"))  # Позиционируем второй GIF в другом месте
 
     # Комбинируем клипы

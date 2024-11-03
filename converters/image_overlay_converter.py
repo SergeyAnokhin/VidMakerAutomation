@@ -80,19 +80,17 @@ class ImageOverlayConverter(BaseConverter):
             VideoFileClip(gif_file, has_mask)
             .loop(duration=duration)
             .resize(resize * 0.5)
-            .with_position(position)
-            .with_start(start_time)
+            .set_position(position)
+            .set_start(start_time)
         )
 
         tool.inspect_clip("gif_clip", gif_clip, self.log)   
 
         self.log.log(f"GIF: Duration: {start_time:3.0f} -> {start_time + duration:3.0f} secs")
-        # gif_clip = gif_clip.mask_color(color=[0, 0, 0], threshold=100, stiffness=5)
-        gif_clip = gif_clip.fx(vfx.mask_color, color=[0, 0, 0], threshold=100, stiffness=5)
+        # gif_clip = gif_clip.mask_color(color=[0, 0, 0], thr=100, s=5)
+        gif_clip = gif_clip.fx(vfx.mask_color, color=[0, 0, 0], thr=100, s=5)
         tool.inspect_clip("gif_clip", gif_clip, self.log)   
         
-        self.log.log(f"Adding gif_clip to metadata: {position[0]}")
-        metadata[position[0]] = gif_clip
-        final_video = slideshow # CompositeVideoClip([slideshow, gif_clip])
+        final_video = CompositeVideoClip([slideshow, gif_clip])
         tool.inspect_clip("final_video", final_video, self.log)   
         return final_video
