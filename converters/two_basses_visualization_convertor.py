@@ -1,3 +1,4 @@
+import tool
 from .base_converter import BaseConverter
 from moviepy.editor import *
 from rich.console import Console
@@ -14,14 +15,14 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         If no clips are provided, raises an error.
         """
         if not clip:
-            console.print(f"[red]No existing clips found. Cannot add audio visualization without clips.[/red]")
+            self.log.error(f"No existing clips found. Cannot add audio visualization without clips.")
             raise ValueError("No existing clips found to add audio visualization.")
 
-        console.print(f"[bold blue]Processing Audio Visualization:[/bold blue] Adding two spots visualization")
+        self.log.log(f"[bold blue]Processing Audio Visualization:[/bold blue] Adding two spots visualization")
 
         # audio_path = self.config.get('audio', {}).get('path')
         # if not audio_path or not os.path.exists(audio_path):
-        #     console.print(f"[red]Audio file not found or path not specified: {audio_path}[/red]")
+        #     self.log.log(f"[red]Audio file not found or path not specified: {audio_path}[/red]")
         #     raise FileNotFoundError("Audio file not found or path not specified.")
 
         # bar_count = self.config.get('visualization', {}).get('bar_count', 30)  # Default bar count to 30
@@ -38,7 +39,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         # updated_clips = []
         # for clip in clips:
-        #     console.print(f"[green]Adding audio visualization to clip with duration {clip.duration} seconds.[/green]")
+        #     self.log.log(f"[green]Adding audio visualization to clip with duration {clip.duration} seconds.[/green]")
         #     updated_clips.append(CompositeVideoClip([clip, visualization_clip.set_duration(clip.duration)]))
         # return updated_clips
         
@@ -84,29 +85,38 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         """
             
         if clip.audio is None or clip.audio.duration is None:
-            print("Audio duration is missing or the audio track is not present.")
+            self.log.log("Audio duration is missing or the audio track is not present.")
         else:
-            print("Audio duration:", clip.audio.duration)        
+            self.log.log(f"Audio duration: {tool.transform_to_MMSS(clip.audio.duration)}")        
         
         # Use specified sample rate or default to 44100 Hz
-        sample_rate = sr if sr else 44100
+        sample_rate = sr if sr else 48000
         
-        print(type(clip.audio))
         # Extract audio as a NumPy array with the specified sample rate
-        # audio_data = clip.audio.to_soundarray(fps=sample_rate)
+        audio_data = clip.audio.to_soundarray(fps=sample_rate)
         
-        # Extract the audio as a list of samples
-        clip.audio.fps = fps
-        audio_samples = list(clip.audio.iter_frames())
+        # # Extract the audio as a list of samples
+        # clip.audio.fps = sample_rate
+        # audio_samples = list(clip.audio.iter_frames())
 
-        # Convert the list of samples to a NumPy array
-        audio_data = np.array(audio_samples)
+        # # Convert the list of samples to a NumPy array
+        # audio_data = np.array(audio_samples)
+        # print(audio_data)
+        # print(audio_data.shape)
         
-        return audio_data, sample_rate    
+        # print("----------------")
+        y, sr = librosa.load("Clip1/The Laughing Heart #6.mp3", sr=None, mono=False)
+        # print(y)
+        # print(y.shape)
+        
+        # raise ValueError("STOP!")
+        
+        #return audio_data, sample_rate    
+        return y, sr
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
     def create_equalizer_clip(self, clip: VideoClip, fps=24, size=(1024, 1024),
-                            colormap=cv2.COLORMAP_JET, circle_radius=100,
+                            colormap=cv2.COLORMAP_JET, circle_radius=None,
                             center_dot_size=15, edge_dot_size=5,
                             colormap_positions=[0.0, 0.33, 0.66, 1.0],
                             num_dots=10,
@@ -116,6 +126,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
                             debug_mode=False):
         duration = clip.duration   
         size = clip.size
+        circle_radius = size[1] * 0.3
     
         if frequency_bands is None:
             frequency_bands = [

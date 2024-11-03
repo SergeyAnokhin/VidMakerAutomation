@@ -34,9 +34,9 @@ class VideoExportConverter(BaseConverter):
         quality_preset = self.config.get('export', {}).get('quality_preset', 'medium')  # Default quality preset
 
         # Log exporting details
-        print(f"Exporting video to {output_path} with FPS: {fps}, Codec: {codec}, Quality: {quality_preset}")
+        self.log.log(f"[green]Exporting video to {output_path} with FPS: {fps}, Codec: {codec}, Quality: {quality_preset}[/green]")
 
         # Export the video clip
-        clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset)
+        clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset, threads=4)
 
         return clip

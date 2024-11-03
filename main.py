@@ -5,7 +5,6 @@ from rich.console import Console
 from icecream import ic
 import traceback
 
-from converters.audio_visualization_converter import AudioVisualizationConverter
 from converters.image_overlay_converter import ImageOverlayConverter
 from converters.join_converter import JoinConverter
 from converters.slideshow_creator_converter import SlideshowCreatorConverter
@@ -13,6 +12,7 @@ from converters.split_converter import SplitConverter
 from converters.text_overlay_converter import TextOverlayConverter
 from converters.two_basses_visualization_convertor import TwoSpotsVisualizationConverter
 from converters.video_export_converter import VideoExportConverter
+from hierarchical_logger import HierarchicalLogger
 
 console = Console()
 
@@ -36,11 +36,13 @@ def process_directory(directory, tasks):
         converters = task.get('converters', [])
         clips = []
         metadata = {}
+        logger = HierarchicalLogger()
+
 
         for converter_data in converters:
             converter_type = converter_data['type']
             config = converter_data.get('config', {})
-            converter = create_converter(converter_type, directory, config)
+            converter = create_converter(converter_type, directory, config, logger)
 
             if converter:
                 clips = converter.process(clips, metadata)
@@ -48,27 +50,26 @@ def process_directory(directory, tasks):
                 console.print(f"[red]Unknown converter type: {converter_type}[/red]")
 
 # Create converter instance
-def create_converter(converter_type, directory, config):
+def create_converter(converter_type, directory, config, logger: HierarchicalLogger):
     converter_map = {
         "AudioReaderConverter": AudioReaderConverter,
         "SlideshowCreatorConverter": SlideshowCreatorConverter,
         "TextOverlayConverter": TextOverlayConverter,
         "ImageOverlayConverter": ImageOverlayConverter,
         "SplitConverter": SplitConverter,
-        "AudioVisualizationConverter": AudioVisualizationConverter,
         "TwoSpotsVisualizationConverter": TwoSpotsVisualizationConverter,
         "JoinConverter": JoinConverter,
         "VideoExportConverter": VideoExportConverter,
     }
     converter_class = converter_map.get(converter_type)
     if converter_class:
-        return converter_class(directory, config)
+        return converter_class(directory, config, logger)
     return None
 
 if __name__ == "__main__":
     # Set base directory
     base_directory = '.'
-
+    
     # Get directories to process
     clip_directories = get_clip_directories(base_directory)
     if not clip_directories:

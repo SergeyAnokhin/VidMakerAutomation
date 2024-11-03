@@ -15,50 +15,50 @@ class SlideshowCreatorConverter(BaseConverter):
         Creates a slideshow from images in the directory and adds it to the clip.
         If no clip is provided, creates a new video clip from the images.
         """
-        console.print("[bold blue]🚀 Starting Slideshow Creation...[/bold blue]")
+        self.log.log("[bold blue]🚀 Starting Slideshow Creation...[/bold blue]")
         image_files = [
             os.path.join(self.directory, f) for f in os.listdir(self.directory)
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.jfif', '.webp'))
         ]
 
         if not image_files:
-            console.print(f"[red]❌ No image files found in directory: {self.directory}[/red]")
+            self.log.log(f"[red]❌ No image files found in directory: {self.directory}[/red]")
             raise FileNotFoundError(f"No image files found in directory: {self.directory}")
 
         total_duration = clip.duration if clip else None
-        console.print(f"[cyan]🎞Input clip duration: ⏱️ {tool.transform_to_MMSS(total_duration)}[/cyan]")
+        self.log.log(f"[cyan]🎞Input clip duration: ⏱️ {tool.transform_to_MMSS(total_duration)}[/cyan]")
 
         duration_per_image = self.config.get('slideshow', {}).get('duration', None)
         if duration_per_image is None:
             if total_duration:
                 duration_per_image = max(total_duration / len(image_files), 2)  # Minimum duration of 2 seconds per image
-                console.print(f"[cyan]⏱️ Calculated duration per image: {duration_per_image} seconds based on total clip duration[/cyan]")
+                self.log.log(f"[cyan]⏱️ Calculated duration per image: {duration_per_image} seconds based on total clip duration[/cyan]")
             else:
                 duration_per_image = 2  # Default duration if not specified, minimum 2 seconds
-                console.print(f"[cyan]⏱️ Default duration per image set to minimum: {duration_per_image} seconds[/cyan]")
+                self.log.log(f"[cyan]⏱️ Default duration per image set to minimum: {duration_per_image} seconds[/cyan]")
         else:
-            console.print(f"[cyan]⏱️ Using specified duration per image: {duration_per_image} seconds[/cyan]")
+            self.log.log(f"[cyan]⏱️ Using specified duration per image: {duration_per_image} seconds[/cyan]")
 
         # Process images to generate clips
         image_clips = self._process_images(image_files, duration_per_image, total_duration)
 
         slideshow = concatenate_videoclips(image_clips, method="compose")
-        console.print("[bold blue]✅ Slideshow created successfully.[/bold blue]")
+        self.log.log("[bold blue]✅ Slideshow created successfully.[/bold blue]")
 
         if clip is None:
-            console.print("[yellow]⚠️ No existing clip provided. Returning slideshow as new clip.[/yellow]")
+            self.log.log("[yellow]⚠️ No existing clip provided. Returning slideshow as new clip.[/yellow]")
             return slideshow
 
-        console.print("[green]🛠️ Overlaying slideshow onto existing clip.[/green]")
+        self.log.log("[green]🛠️ Overlaying slideshow onto existing clip.[/green]")
 
         if clip.h != image_clips[0].h or clip.w != image_clips[0].w:
             original_clip_size = (clip.w, clip.h)
             clip = clip.resize(height=image_clips[0].h).crop(0, 0, width=image_clips[0].w, height=image_clips[0].h)
             resized_clip_size = (clip.w, clip.h)
-            console.print(f"[yellow]🔄 Resizing and cropping incoming clip from {original_clip_size} to {resized_clip_size} pixels[/yellow]")
+            self.log.log(f"[yellow]🔄 Resizing and cropping incoming clip from {original_clip_size} to {resized_clip_size} pixels[/yellow]")
 
         updated_clip = CompositeVideoClip([clip, slideshow.set_duration(clip.duration)])
-        console.print("[bold blue]🎉 Slideshow added to existing clip successfully.[/bold blue]")
+        self.log.log("[bold blue]🎉 Slideshow added to existing clip successfully.[/bold blue]")
         return updated_clip
 
     def _process_images(self, image_files, duration_per_image, total_duration):
@@ -72,9 +72,9 @@ class SlideshowCreatorConverter(BaseConverter):
         fade_in_first_image = transition_config.get('fade_in_first_image', True)  # Default to True
 
         height = self.config.get('slideshow', {}).get('height', 1024)  # Default image height to 1024
-        console.print(f"[cyan]🖼️ Image height set to: ↕{height} pixels[/cyan]")
+        self.log.log(f"[cyan]🖼️ Image height set to: ↕{height} pixels[/cyan]")
 
-        console.print(f"[cyan]🌟 Transition fade-in duration: ⬆{fade_in_duration}s, fade-out duration: ⬇{fade_out_duration}s[/cyan]")
+        self.log.log(f"[cyan]🌟 Transition fade-in duration: ⬆{fade_in_duration}s, fade-out duration: ⬇{fade_out_duration}s[/cyan]")
         
         # Initialize table for detailed image information
         table = Table(title="Slideshow Image Details")
@@ -94,10 +94,10 @@ class SlideshowCreatorConverter(BaseConverter):
         # Cycle through images repeatedly until the total duration is reached
         while start_time < total_duration:
             for image_file in image_files:
-                # console.print(f"[cyan]🔂 Loop:{start_time} -> {total_duration} [/cyan]")
+                # self.log.log(f"[cyan]🔂 Loop:{start_time} -> {total_duration} [/cyan]")
                 if start_time >= total_duration:
                     break
-                    # console.print(table)
+                    # self.log.log(table)
                     # return image_clips
 
                 image_clip = ImageClip(image_file)
@@ -107,7 +107,7 @@ class SlideshowCreatorConverter(BaseConverter):
                     new_width = int(image_clip.w * (height / image_clip.h))
                     image_clip = image_clip.resize(height=height)
                     resized_size = (new_width, height)
-                    console.print(f"[yellow]🔄 Resizing image {os.path.basename(image_file)} from ↕{original_size} to ↕{resized_size} pixels[/yellow]")
+                    self.log.log(f"[yellow]🔄 Resizing image {os.path.basename(image_file)} from ↕{original_size} to ↕{resized_size} pixels[/yellow]")
                 else:
                     resized_size = original_size
 
@@ -138,6 +138,6 @@ class SlideshowCreatorConverter(BaseConverter):
                 )
                 index += 1
                 
-        console.print(table)
+        self.log.print(table)
         return image_clips
         

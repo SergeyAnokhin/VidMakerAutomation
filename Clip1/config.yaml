@@ -7,8 +7,8 @@ tasks:
     converters:
       - type: "AudioReaderConverter"
         config:
-          # start_time: 0
-          # end_time: 30  # End of the audio
+          start_time: 0
+          end_time: 10  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
@@ -50,8 +50,8 @@ tasks:
       - type: "TwoSpotsVisualizationConverter"
         config:
           visualization:
-            fps: 24
-            palette: "COLORMAP_JET"  # OpenCV colormap naming convention
+            fps: 60
+            palette: "COLORMAP_AUTUMN"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
       # - type: "JoinConverter"
       # - type: "AudioReaderConverter"
       #   config:
@@ -61,7 +61,7 @@ tasks:
         config:
           export:
             output_path: "output.mp4"
-            fps: 24
+            fps: 60
             codec: "libx264"
             quality_preset: "medium"
 
