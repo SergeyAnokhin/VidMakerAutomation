@@ -63,7 +63,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         return clip
     
-    def load_audio_from_videoclip(self, clip: VideoClip, fps=24, sr=None, type="librosa", metadata=None):
+    def load_audio_from_videoclip(self, clip: VideoClip, fps=24, sr=None, type="moviepy", metadata=None):
         """
         Extracts audio from a VideoFileClip, returning it in a format similar to `librosa.load`.
 
@@ -98,7 +98,12 @@ class TwoSpotsVisualizationConverter(BaseConverter):
             audio_data = np.array(audio_samples)
             return audio_data.T, sample_rate    
         else:
+            # TODO: fix duration of audio
+            self.log.log(f"[grey]🎵 Loading audio from file: [bold]{metadata['audio_file']}[/bold][/grey]")
             y, sr = librosa.load(metadata["audio_file"], sr=None, mono=False)
+            self.log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sr}[/bold] Hz[/grey]")
+            self.log.log(f"[grey]🔢 Первые 50 значений аудио:[/grey]")
+            self.log.log(f"[grey]{y[:50]}[/grey]")
             return y, sr
 
         # self.log.log(f"[grey]🔊 Converting audio samples to NumPy array with shape {audio_data.shape}[/grey]")
@@ -117,7 +122,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
     def create_equalizer_clip(self, clip: VideoClip, fps, size, colormap=cv2.COLORMAP_JET,
-                            debug_mode=False, metadata=None):
+                            debug_mode=True, metadata=None):
         
         # circle_radius=300,
         # center_dot_size=15, edge_dot_size=5,
@@ -126,6 +131,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # amplitude_threshold=0.05,
         # frequency_bands=None,
 
+        resize_factor = size[1] / 1024
         duration = clip.duration   
         size = clip.size
         # Radius of the visualization circle, set to 25% of video height
@@ -136,7 +142,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # |         /|\                 |
         # |                             |
         # |_____________________________|
-        circle_radius = size[1] * 0.25
+        circle_radius = size[1] * 0.3 * resize_factor
 
         # Positions for color transitions in the colormap (0.0=start color, 1.0=end color)
         # Example:
@@ -150,14 +156,14 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         #   /     ○    \  <- Center dot expands/contracts with beat
         #  |   ●●●●●●   | 
         #   \__________/
-        center_dot_size=35
+        center_dot_size=35 * resize_factor
 
         # Size in pixels of the smaller dots around the circle edge
         # Example:
         #      ○        
         #   •       •    <- 5px dots
         #      ○
-        edge_dot_size=3
+        edge_dot_size=5 * resize_factor
 
         # Number of dots to display around the circle
         # Example:
@@ -166,7 +172,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         #  •           •
         #    •       •
         #      • • •
-        num_dots=30
+        num_dots=round(30 * resize_factor)
 
         # Vertical position of circle center as percentage from top of frame
         # Example for 7%:
@@ -199,11 +205,12 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         # Создаем эквалайзерный клип
         # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
+        amp_factor = 0.15
         frequency_bands = [
-            {'band': (20, 80), 'amplification': 1.0},
-            {'band': (80, 255), 'amplification': 1.0}, # humain voice band
-            {'band': (255, 500), 'amplification': 1.0},
-            {'band': (500, 8000), 'amplification': 1.0},
+            {'band': (20, 80), 'amplification': 2.0 * amp_factor},
+            {'band': (80, 255), 'amplification': 14.0 * amp_factor}, # humain voice band
+            {'band': (255, 500), 'amplification': 3.0 * amp_factor},
+            {'band': (500, 8000), 'amplification': 40.0 * amp_factor},
         ]
         # Load audio file
         # y, sr = librosa.load(audio_file, sr=None, mono=False)

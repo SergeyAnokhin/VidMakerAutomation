@@ -3,7 +3,7 @@
 # List of tasks to be executed for the directory
 # Each task has a set of converters that are applied in sequence
 
-fps: &default_fps 60
+fps: &default_fps 24
 
 tasks:
   - name: "Create Full Length Video"
