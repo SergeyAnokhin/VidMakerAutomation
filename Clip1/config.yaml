@@ -3,7 +3,7 @@
 # List of tasks to be executed for the directory
 # Each task has a set of converters that are applied in sequence
 
-fps: &default_fps 24
+fps: &default_fps 60
 
 tasks:
   - name: "Create Full Length Video"
@@ -53,6 +53,8 @@ tasks:
       #     parts: 3
       - type: "TwoSpotsVisualizationConverter"
         config:
+          audio:
+            sample_rate: 48000
           visualization:
             fps: *default_fps
             colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/

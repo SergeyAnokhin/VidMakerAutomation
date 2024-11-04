@@ -63,7 +63,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         return clip
     
-    def load_audio_from_videoclip(self, clip: VideoClip, fps=24, sr=None, type="moviepy", metadata=None):
+    def load_audio_from_videoclip(self, clip: VideoClip, fps=24, type="moviepy", metadata=None):
         """
         Extracts audio from a VideoFileClip, returning it in a format similar to `librosa.load`.
 
@@ -85,10 +85,11 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         self.log.log(f"[grey]🎵 Using [bold]{type}[/bold] type to load audio[/grey]")
         if type == "moviepy":
             # Use specified sample rate or default to 44100 Hz
-            sample_rate = sr if sr else 10000
+            sample_rate = self.config.get('audio', {}).get('sample_rate', 48000)
             
             # Extract audio as a NumPy array with the specified sample rate
             # audio_data = clip.audio.to_soundarray(fps=sample_rate)
+            self.log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sample_rate}[/bold] Hz[/grey]")
             
             # Extract the audio as a list of samples
             audio_samples = list(clip.audio.iter_frames(fps=sample_rate))
@@ -122,7 +123,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
     def create_equalizer_clip(self, clip: VideoClip, fps, size, colormap=cv2.COLORMAP_JET,
-                            debug_mode=True, metadata=None):
+                            debug_mode=False, metadata=None):
         
         # circle_radius=300,
         # center_dot_size=15, edge_dot_size=5,

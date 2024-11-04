@@ -55,7 +55,7 @@ class JoinConverter(BaseConverter):
                 codec=codec,
                 bitrate=bitrate,
                 preset=preset,
-                threads=4  # добавляем параллельность
+                threads=4  
             )
             temp_files.append(temp_filename)
 
