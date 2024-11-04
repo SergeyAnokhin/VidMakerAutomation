@@ -207,8 +207,8 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
         amp_factor = 0.15
         frequency_bands = [
-            {'band': (20, 80), 'amplification': 2.0 * amp_factor},
-            {'band': (80, 255), 'amplification': 14.0 * amp_factor}, # humain voice band
+            {'band': (20, 80), 'amplification': 1.0 * amp_factor},
+            {'band': (80, 255), 'amplification': 3.0 * amp_factor}, # humain voice band
             {'band': (255, 500), 'amplification': 3.0 * amp_factor},
             {'band': (500, 8000), 'amplification': 40.0 * amp_factor},
         ]
