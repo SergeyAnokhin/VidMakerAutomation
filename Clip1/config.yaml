@@ -10,8 +10,8 @@ tasks:
     converters:
       - type: "AudioReaderConverter"
         config:
-          start_time: 0
-          end_time: 60  # End of the audio
+          # start_time: 0
+          # end_time: 60  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
