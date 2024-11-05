@@ -1,8 +1,10 @@
 # Requirements for Video Creation Pipeline Project
-# pip install -r ..\requirements.txt
+# pip install -r requirements.txt
 # pip install git+https://github.com/Zulko/moviepy.git@bc8d1a831d2d1f61abfdf1779e8df95d523947a5
 # pip install moviepy==1.0.3
 moviepy==1.0.3
 PyYAML
 rich
 icecream
+opencv-python
+librosa

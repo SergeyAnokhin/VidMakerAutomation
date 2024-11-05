@@ -7,7 +7,7 @@ import tempfile
 console = Console()
 
 class JoinConverter(BaseConverter):
-    def convert(self, clips, metadata):
+    def process(self, clips, metadata):
         """
         Joins multiple video clips into a single video clip by first saving
         each clip as a temporary file using specified config settings, and then 
@@ -30,9 +30,9 @@ class JoinConverter(BaseConverter):
             raise ValueError("No existing clips found to join.")
 
         # Verify each clip is a VideoClip instance
-        if not all(isinstance(clip, VideoFileClip) for clip in clips):
-            console.print("[red]All items in 'clips' must be instances of VideoFileClip.[/red]")
-            raise TypeError("All items in 'clips' must be VideoFileClip instances.")
+        # if not all(isinstance(clip, VideoFileClip) for clip in clips):
+        #     console.print("[red]All items in 'clips' must be instances of VideoFileClip.[/red]")
+        #     raise TypeError("All items in 'clips' must be VideoFileClip instances.")
 
         console.print(f"[bold blue]Processing Join Converter:[/bold blue] Joining {len(clips)} clips")
 
@@ -70,3 +70,7 @@ class JoinConverter(BaseConverter):
         console.print("[blue]Temporary files cleaned up.[/blue]")
 
         return joined_clip
+
+    def convert(self, clip, meatdata):
+        # not used
+        pass

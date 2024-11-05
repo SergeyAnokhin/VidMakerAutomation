@@ -48,17 +48,27 @@ tasks:
           timing:
             start_time: -32
             duration: 10
-      # - type: "SplitConverter"
-      #   config:
-      #     parts: 3
-      - type: "TwoSpotsVisualizationConverter"
+      - type: "SplitConverter"
         config:
-          audio:
-            sample_rate: 48000
-          visualization:
-            fps: *default_fps
-            colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-      # - type: "JoinConverter"
+          parts: 3
+      # - type: "ChannelBarsVisualizer"
+      #   config:
+      #     audio:
+      #       sample_rate: 48000
+      #     visualization:
+      #       fps: *default_fps
+      #       bar_height_scale: 1.0
+      #       bar_width: 20
+      #       spacing: 10
+      #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
+      # - type: "TwoSpotsVisualizationConverter"
+      #   config:
+      #     audio:
+      #       sample_rate: 48000
+      #     visualization:
+      #       fps: *default_fps
+      #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
+      - type: "JoinConverter"
       # - type: "AudioReaderConverter"
       #   config:
       #     start_time: 0

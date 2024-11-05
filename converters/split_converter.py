@@ -5,7 +5,7 @@ from rich.console import Console
 console = Console()
 
 class SplitConverter(BaseConverter):
-    def convert(self, clips, metadata):
+    def process(self, clips, metadata):
         """
         Splits the input video clip into multiple parts as defined in the configuration.
         If no clips are provided, raises an error.
@@ -24,3 +24,7 @@ class SplitConverter(BaseConverter):
             split_clips.extend([clip.subclip(i * duration, (i + 1) * duration) for i in range(num_parts)])
 
         return split_clips
+
+    def convert(self, clip, meatdata):
+        # not used
+        pass

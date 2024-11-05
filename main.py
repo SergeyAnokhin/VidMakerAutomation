@@ -5,6 +5,7 @@ from rich.console import Console
 from icecream import ic
 import traceback
 
+from converters.channel_bars_visualizer import ChannelBarsVisualizer
 from converters.image_overlay_converter import ImageOverlayConverter
 from converters.join_converter import JoinConverter
 from converters.slideshow_creator_converter import SlideshowCreatorConverter
@@ -58,6 +59,7 @@ def create_converter(converter_type, directory, config, logger: HierarchicalLogg
         "ImageOverlayConverter": ImageOverlayConverter,
         "SplitConverter": SplitConverter,
         "TwoSpotsVisualizationConverter": TwoSpotsVisualizationConverter,
+        "ChannelBarsVisualizer": ChannelBarsVisualizer,
         "JoinConverter": JoinConverter,
         "VideoExportConverter": VideoExportConverter,
     }

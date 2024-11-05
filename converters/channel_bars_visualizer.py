@@ -22,8 +22,7 @@ class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your pro
         bar_height_scale = self.config.get('visualization', {}).get('bar_height_scale', 0.8)
         
         # Visualization image size
-        image_width = self.config.get('visualization', {}).get('image_width', 800)
-        image_height = self.config.get('visualization', {}).get('image_height', 600)
+        image_size = clip.size
         bar_width = self.config.get('visualization', {}).get('bar_width', 20)
         spacing = self.config.get('visualization', {}).get('spacing', 10)
 
@@ -34,7 +33,7 @@ class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your pro
         frequency_bands = self.config.get('frequency_bands', [60, 250, 500, 2000])
 
         # Create an image to draw the visualization on
-        image = Image.new("RGB", (image_width, image_height), "black")
+        image = Image.new("RGB", image_size, "black")
         draw = ImageDraw.Draw(image)
         
         # Split audio data into left and right channels
@@ -45,8 +44,8 @@ class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your pro
         right_bars = self.calculate_frequency_bounce(right_channel, frequency_bands, bar_height_scale)
         
         # Draw bars for both channels
-        self.draw_bars(draw, left_bars, side="left", colormap=colormap)
-        self.draw_bars(draw, right_bars, side="right", colormap=colormap)
+        self.draw_bars(draw, left_bars, side="left", colormap=colormap, size=image_size)
+        self.draw_bars(draw, right_bars, side="right", colormap=colormap, size=image_size)
         
         return image
 
@@ -67,7 +66,7 @@ class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your pro
         
         return amplitudes
 
-    def draw_bars(self, draw, amplitudes, side="left", colormap=cv2.COLORMAP_JET):
+    def draw_bars(self, draw: ImageDraw, amplitudes, side="left", colormap=cv2.COLORMAP_JET):
         """ Draw bars on the image using OpenCV ColorMap """
         for idx, amplitude in enumerate(amplitudes):
             # Determine color for each bar based on amplitude
@@ -81,8 +80,8 @@ class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your pro
             else:
                 x_pos = self.config['visualization']['image_width'] - (idx + 1) * (self.config['visualization']['bar_width'] + self.config['visualization']['spacing'])
 
-            y_top = self.config['visualization']['image_height'] - amplitude
-            y_bottom = self.config['visualization']['image_height']
+            y_top = draw.size[1] - amplitude
+            y_bottom = draw.size[1]
 
             # Draw the rectangle for each bar
             draw.rectangle([x_pos, y_top, x_pos + self.config['visualization']['bar_width'], y_bottom], fill=color_tuple)
