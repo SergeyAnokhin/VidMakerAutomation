@@ -30,6 +30,17 @@ class BaseConverter(ABC):
         """
         pass
 
+    def convert_async(self, clips, metadata, method):
+        """
+        Convert a single clip synchronously.
+        """
+        converter_name = self.__class__.__name__
+        with ThreadPoolExecutor() as executor:
+            self.mylog.log(f"{converter_name}: [blue]Multiple clips detected, processing in parallel[/blue]")
+            self.log_clip_conversion(converter_name)
+            results = list(executor.map(lambda clip: method(clip, metadata), clips))
+        return results
+
     def process(self, clips, metadata):
         """
         Manages single or multi-clip processing.
@@ -42,10 +53,7 @@ class BaseConverter(ABC):
         converter_name = self.__class__.__name__
 
         if len(clips) > 1:
-            with ThreadPoolExecutor() as executor:
-                self.mylog.log(f"{converter_name}: [blue]Multiple clips detected, processing in parallel[/blue]")
-                self.log_clip_conversion(converter_name)
-                results = list(executor.map(lambda clip: self.convert(clip, metadata), clips))
+            return self.convert_async(clips, metadata, self.convert)
         else:
             self.mylog.log(f"{converter_name}: [blue]Single clip detected, processing sequentially[/blue]")
             self.log_clip_conversion(converter_name)

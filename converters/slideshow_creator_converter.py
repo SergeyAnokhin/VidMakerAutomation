@@ -17,7 +17,7 @@ class SlideshowCreatorConverter(BaseConverter):
         """
         self.log.log("[bold blue]🚀 Starting Slideshow Creation...[/bold blue]")
         image_files = [
-            os.path.join(self.directory, f) for f in os.listdir(self.directory)
+            os.path.join(self.directory, f) for f in sorted(os.listdir(self.directory))
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.jfif', '.webp'))
         ]
 

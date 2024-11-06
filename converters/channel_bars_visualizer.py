@@ -3,21 +3,22 @@ import cv2
 from moviepy.editor import AudioFileClip
 from PIL import Image, ImageDraw, ImageFont
 from .base_converter import BaseConverter
+import tool
 
 class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your provided base class
 
-    def __init__(self, config):
-        self.config = config
-        self.num_bars_per_channel = 4  # four bars for each channel
-        self.font = ImageFont.load_default()  # Font for bar height labels
+    num_bars_per_channel = 4  # four bars for each channel
+    font = ImageFont.load_default()  # Font for bar height labels
 
-    def convert(self, clip):
+    def convert(self, clip, metadata):
         # Extract audio data from the video clip
+        fps = self.config.get('visualization', {}).get('fps', 60)
+        sample_rate = self.config.get('audio', {}).get('sample_rate', 48000)
+
         audio = clip.audio
-        audio_data = self.extract_audio_data(audio)
+        audio_data, sample_rate = tool.load_audio_from_videoclip(audio, self.log, fps, metadata=metadata, sample_rate=sample_rate)
         
         # Configuration parameters
-        fps = self.config.get('visualization', {}).get('fps', 60)
         colormap_name = self.config.get('visualization', {}).get('colormap', 'COLORMAP_JET')
         bar_height_scale = self.config.get('visualization', {}).get('bar_height_scale', 0.8)
         
@@ -49,10 +50,6 @@ class ChannelBarsVisualizer(BaseConverter):  # Assuming BasicConvert is your pro
         
         return image
 
-    def extract_audio_data(self, audio):
-        """ Extract audio data from MoviePy AudioFileClip """
-        audio_data = np.array(list(audio.iter_frames(fps=audio.fps)))[:, 0]  # Only keep one channel
-        return audio_data
     
     def calculate_frequency_bounce(self, channel_data, frequency_bands, scale):
         """ Calculate amplitude for each frequency band (Frequency Bounce) """

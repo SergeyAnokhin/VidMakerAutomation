@@ -3,19 +3,19 @@
 # List of tasks to be executed for the directory
 # Each task has a set of converters that are applied in sequence
 
-fps: &default_fps 60
+fps: &default_fps 24
 
 tasks:
   - name: "Create Full Length Video"
     converters:
       - type: "AudioReaderConverter"
         config:
-          # start_time: 0
-          # end_time: 60  # End of the audio
+          start_time: 0
+          end_time: 60  # End of the audio
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
-            height: 1024  # Height of the images to be unified
+            height: 512  # Height of the images to be unified
             duration: 10
           transition:
             fade_in: 0.5  # Fade-in duration in seconds
@@ -47,7 +47,7 @@ tasks:
               y: "bottom"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
           timing:
             start_time: -32
-            duration: 10
+            duration: 31
       - type: "SplitConverter"
         config:
           parts: 3
@@ -64,7 +64,7 @@ tasks:
       # - type: "TwoSpotsVisualizationConverter"
       #   config:
       #     audio:
-      #       sample_rate: 48000
+      #       sample_rate: 
       #     visualization:
       #       fps: *default_fps
       #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/

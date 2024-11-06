@@ -63,63 +63,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         return clip
     
-    def load_audio_from_videoclip(self, clip: VideoClip, fps=24, type="moviepy", metadata=None):
-        """
-        Extracts audio from a VideoFileClip, returning it in a format similar to `librosa.load`.
 
-        Parameters:
-            video_clip (VideoFileClip): The MoviePy VideoFileClip object.
-            sr (int or None): Desired sample rate. If None, uses the original sample rate of the video.
-            mono (bool): If True, converts the audio to mono. If False, keeps stereo (if available).
-
-        Returns:
-            y (np.ndarray): Audio data as a NumPy array. 1D if mono, 2D if stereo.
-            sr (int): The sample rate of the audio data.
-        """
-            
-        if clip.audio is None or clip.audio.duration is None:
-            self.log.log("Audio duration is missing or the audio track is not present.")
-        else:
-            self.log.log(f"Audio duration: {tool.transform_to_MMSS(clip.audio.duration)}")        
-        
-        self.log.log(f"[grey]🎵 Using [bold]{type}[/bold] type to load audio[/grey]")
-        if type == "moviepy":
-            # Use specified sample rate or default to 44100 Hz
-            sample_rate = self.config.get('audio', {}).get('sample_rate', 48000)
-            
-            # Extract audio as a NumPy array with the specified sample rate
-            # audio_data = clip.audio.to_soundarray(fps=sample_rate)
-            self.log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sample_rate}[/bold] Hz[/grey]")
-            
-            # Extract the audio as a list of samples
-            audio_samples = list(clip.audio.iter_frames(fps=sample_rate))
-            # self.log.log(f"[grey]🎵 Setting audio sample rate: {sample_rate} Hz. 📊 Got {len(audio_samples)} audio samples[/grey]")
-
-            # Convert the list of samples to a NumPy array
-            audio_data = np.array(audio_samples)
-            return audio_data.T, sample_rate    
-        else:
-            # TODO: fix duration of audio
-            self.log.log(f"[grey]🎵 Loading audio from file: [bold]{metadata['audio_file']}[/bold][/grey]")
-            y, sr = librosa.load(metadata["audio_file"], sr=None, mono=False)
-            self.log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sr}[/bold] Hz[/grey]")
-            self.log.log(f"[grey]🔢 Первые 50 значений аудио:[/grey]")
-            self.log.log(f"[grey]{y[:50]}[/grey]")
-            return y, sr
-
-        # self.log.log(f"[grey]🔊 Converting audio samples to NumPy array with shape {audio_data.shape}[/grey]")
-        # print(audio_data)
-        # print(audio_data.shape)
-        
-        # print("----------------")
-        # y, sr = librosa.load("Clip1/The Laughing Heart #6.mp3", sr=None, mono=False)
-        # print(y)
-        # print(sr)
-        # print(y.shape)
-        
-        # raise ValueError("STOP!")
-        
-        # return y, sr
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
     def create_equalizer_clip(self, clip: VideoClip, fps, size, colormap=cv2.COLORMAP_JET,
@@ -215,7 +159,8 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         ]
         # Load audio file
         # y, sr = librosa.load(audio_file, sr=None, mono=False)
-        y, sr = self.load_audio_from_videoclip(clip, fps, metadata=metadata)
+        sample_rate = self.config.get('audio', {}).get('sample_rate', 48000)
+        y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
 
         self.log.log(f"[grey]🎨Used colormap: {tool.get_colormap_name(colormap)}[/grey]")        
         self.log.log(f"[grey]🔊Used frequency bands: [/grey]")        
