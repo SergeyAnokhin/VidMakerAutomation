@@ -25,6 +25,6 @@ class SplitConverter(BaseConverter):
 
         return split_clips
 
-    def convert(self, clip, meatdata):
+    def convert(self, clip, metadata):
         # not used
         pass

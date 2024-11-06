@@ -7,7 +7,7 @@ fps: &default_fps 24
 video_quality: &quality
   fps: *default_fps
   codec: "libx264"
-  quality_preset: "medium"
+  preset: "medium"
 crop: &crop
   start_time: 0
   end_time: 30  # End of the audio
@@ -76,13 +76,11 @@ tasks:
       - type: "JoinConverter"
         confug:
           quality: *quality
-      # - type: "AudioReaderConverter"
-      #   config:
-      #     start_time: 0
-      #     end_time: null  # End of the audio, searches for mp3 in directory
+      - type: "AudioReaderConverter"
+        config: *crop
       - type: "VideoExportConverter"
         config:
-          export: *quality
+          quality: *quality
 
   # - name: "Create YouTube Short"
   #   converters:

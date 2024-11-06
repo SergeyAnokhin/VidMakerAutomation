@@ -29,8 +29,6 @@ class AudioReaderConverter(BaseConverter):
 
         audio_file = audio_files[0]
 
-        self.suggest_frequency_bands(audio_file)
-        
         start_time = self.config.get('start_time', 0)
         end_time = self.config.get('end_time', None)
 
@@ -46,6 +44,7 @@ class AudioReaderConverter(BaseConverter):
         if clip is None:
             self.log.warn("No existing video clip provided. Returning audio as new clip.")
             clip = ColorClip(size=(1024, 1024), color=(0, 0, 0), duration=audio_clip.duration)
+            self.suggest_frequency_bands(audio_file)    
         else:
             self.log.log("[green]🛠️ Adding audio to existing video clip.[/green]")
 

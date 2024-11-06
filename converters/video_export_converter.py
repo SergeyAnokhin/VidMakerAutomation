@@ -29,9 +29,9 @@ class VideoExportConverter(BaseConverter):
             timestamp = time.strftime("%H_%M_%S", time.localtime())
             output_path = os.path.join(self.directory, f"{audio_file}_{timestamp}.mp4")
 
-        fps = self.config.get('export', {}).get('fps', 24)  # Default FPS to 24
-        codec = self.config.get('export', {}).get('codec', 'libx264')  # Default codec to 'libx264'
-        quality_preset = self.config.get('export', {}).get('quality_preset', 'medium')  # Default quality preset
+        fps = self.config.get('quality', {}).get('fps', 24)  # Default FPS to 24
+        codec = self.config.get('quality', {}).get('codec', 'libx264')  # Default codec to 'libx264'
+        quality_preset = self.config.get('quality', {}).get('preset', 'medium')  # Default quality preset
 
         # Log exporting details
         self.log.log(f"[green]Exporting video to {output_path} with FPS: {fps}, Codec: {codec}, Quality: {quality_preset}[/green]")

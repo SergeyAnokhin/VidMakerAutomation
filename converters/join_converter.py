@@ -40,7 +40,6 @@ class JoinConverter(BaseConverter):
         # Config settings for saving temporary clips
         self.fps = self.config.get("fps", 24)
         self.codec = self.config.get("codec", "libx264")
-        self.bitrate = self.config.get("bitrate", "2000k")
         self.preset = self.config.get("preset", "medium")
         temp_files = []
 
@@ -60,34 +59,20 @@ class JoinConverter(BaseConverter):
 
         return [joined_clip]
 
-    def save_temp_file(self, clip, metadata):
-        pass
-
-    # def convert_async(self, clips, metadata, method):
-    #     for idx, clip in enumerate(clips):
-    #         temp_filename = os.path.join(temp_dir, f"temp_clip_{idx}.mp4")
-    #         console.print(f"[yellow]Saving clip {idx+1} as temporary file: {temp_filename}[/yellow]")
-            
-    #         clip.write_videofile(
-    #             temp_filename,
-    #             fps=fps,
-    #             codec=codec,
-    #             bitrate=bitrate,
-    #             preset=preset,
-    #             threads=4  
-    #         )
-    #         temp_files.append(temp_filename)
-
-    def convert(self, clip, meatdata):
+    def convert(self, clip, metadata):
         clip_uuid = str(uuid.uuid4())
         temp_filename = os.path.join(self.directory, f"temp_clip_{clip_uuid}.mp4")
         console.print(f"[yellow]Saving clip as temporary file: {temp_filename}. Clip duration: [bold]{clip.duration}[/bold] secs [/yellow]")
+        console.print(f"[grey]🎥 Saving with parameters: fps=[bold]{self.fps}[/bold], codec=[bold]{self.codec}[/bold], preset=[bold]{self.preset}[/bold][/grey]")
+        if clip.audio is None or clip.audio.duration is None:
+            self.log.log("[yellow]⚠️ Clip does not contain audio or audio duration is missing[/yellow]")
+        else:
+            self.log.log(f"[grey]🎵 Audio duration: [bold]{clip.audio.duration}[/bold] seconds[/grey]")
         
         clip.write_videofile(
             temp_filename,
             fps=self.fps,   
             codec=self.codec,
-            bitrate=self.bitrate,
             preset=self.preset,
             audio=False,
             threads=4  
