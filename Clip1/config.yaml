@@ -4,14 +4,19 @@
 # Each task has a set of converters that are applied in sequence
 
 fps: &default_fps 24
+video_quality: &quality
+  fps: *default_fps
+  codec: "libx264"
+  quality_preset: "medium"
+crop: &crop
+  start_time: 0
+  end_time: 30  # End of the audio
 
 tasks:
   - name: "Create Full Length Video"
     converters:
       - type: "AudioReaderConverter"
-        config:
-          start_time: 0
-          end_time: 60  # End of the audio
+        config: *crop
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
@@ -37,17 +42,17 @@ tasks:
       #     transition:
       #       fade_in: 0.5
       #       fade_out: 0.5
-      - type: "ImageOverlayConverter"
-        config:
-          image:
-            path: "static/animated2.gif"
-            resize: 0.5
-            position:
-              x: "left"  # Position in pixels (e.g., '10pt') or percentage (e.g., '10%')
-              y: "bottom"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
-          timing:
-            start_time: -32
-            duration: 31
+      # - type: "ImageOverlayConverter"
+      #   config:
+      #     image:
+      #       path: "static/animated2.gif"
+      #       resize: 0.5
+      #       position:
+      #         x: "left"  # Position in pixels (e.g., '10pt') or percentage (e.g., '10%')
+      #         y: "bottom"  # Position in pixels (e.g., '20pt') or percentage (e.g., '20%')
+      #     timing:
+      #       start_time: -32
+      #       duration: 31
       - type: "SplitConverter"
         config:
           parts: 3
@@ -64,22 +69,20 @@ tasks:
       # - type: "TwoSpotsVisualizationConverter"
       #   config:
       #     audio:
-      #       sample_rate: 
+      #       sample_rate: 48000
       #     visualization:
       #       fps: *default_fps
       #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
       - type: "JoinConverter"
+        confug:
+          quality: *quality
       # - type: "AudioReaderConverter"
       #   config:
       #     start_time: 0
       #     end_time: null  # End of the audio, searches for mp3 in directory
       - type: "VideoExportConverter"
         config:
-          export:
-            output_path: "output.mp4"
-            fps: *default_fps
-            codec: "libx264"
-            quality_preset: "medium"
+          export: *quality
 
   # - name: "Create YouTube Short"
   #   converters:

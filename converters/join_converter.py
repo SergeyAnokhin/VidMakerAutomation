@@ -48,16 +48,17 @@ class JoinConverter(BaseConverter):
         temp_files = self.convert_async(clips, metadata, self.convert)
 
         # Load temporary files and concatenate
+        console.print(temp_files)
         video_clips = [VideoFileClip(f) for f in temp_files]
         joined_clip = concatenate_videoclips(video_clips)
         console.print(f"[green]Successfully joined {len(video_clips)} clips into a single clip with duration {joined_clip.duration} seconds.[/green]")
 
         # Clean up temporary files after concatenation
-        for file in temp_files:
-            os.remove(file)
+        # for file in temp_files:
+        #     os.remove(file)
         console.print("[blue]Temporary files cleaned up.[/blue]")
 
-        return joined_clip
+        return [joined_clip]
 
     def save_temp_file(self, clip, metadata):
         pass
@@ -80,7 +81,7 @@ class JoinConverter(BaseConverter):
     def convert(self, clip, meatdata):
         clip_uuid = str(uuid.uuid4())
         temp_filename = os.path.join(self.directory, f"temp_clip_{clip_uuid}.mp4")
-        console.print(f"[yellow]Saving clip as temporary file: {temp_filename}[/yellow]")
+        console.print(f"[yellow]Saving clip as temporary file: {temp_filename}. Clip duration: [bold]{clip.duration}[/bold] secs [/yellow]")
         
         clip.write_videofile(
             temp_filename,
@@ -88,5 +89,7 @@ class JoinConverter(BaseConverter):
             codec=self.codec,
             bitrate=self.bitrate,
             preset=self.preset,
+            audio=False,
             threads=4  
         )
+        return temp_filename

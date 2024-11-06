@@ -64,16 +64,22 @@ def inspect_clip(name, clip, log, debug=False):
 
 def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", metadata=None, sample_rate=None):
     """
-    Extracts audio from a VideoFileClip, returning it in a format similar to `librosa.load`.
+    Extracts audio from a video clip and returns it in a format compatible with librosa.load or moviepy output.
 
     Parameters:
-        video_clip (VideoFileClip): The MoviePy VideoFileClip object.
-        sr (int or None): Desired sample rate. If None, uses the original sample rate of the video.
-        mono (bool): If True, converts the audio to mono. If False, keeps stereo (if available).
+        clip (VideoClip): MoviePy VideoClip object containing video with audio
+        log (HierarchicalLogger): Logger for outputting process information
+        fps (int): Frame rate for audio extraction (default 24)
+        type (str): Audio extraction type - "moviepy" or "librosa"
+        metadata (dict): Metadata containing audio file path for librosa
+        sample_rate (int): Desired audio sampling rate in Hz
 
     Returns:
-        y (np.ndarray): Audio data as a NumPy array. 1D if mono, 2D if stereo.
-        sr (int): The sample rate of the audio data.
+        tuple:
+            - np.ndarray: Audio data as NumPy array
+              For mono: 1D array of values [-1, 1]
+              For stereo: 2D array [left_channel, right_channel] with values [-1, 1]
+            - int: Audio sampling rate in Hz
     """
         
     if clip.audio is None or clip.audio.duration is None:
@@ -83,15 +89,14 @@ def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", meta
     
     log.log(f"[grey]🎵 Using [bold]{type}[/bold] type to load audio[/grey]")
     if type == "moviepy":
-        # Use specified sample rate or default to 44100 Hz
-
         # Extract audio as a NumPy array with the specified sample rate
-        # audio_data = clip.audio.to_soundarray(fps=sample_rate)
         log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sample_rate}[/bold] Hz[/grey]")
         
-        # Extract the audio as a list of samples
+        # Get audio samples as a list of frames, where each frame is a numpy array
+        # For mono audio: each frame is a single float value between -1 and 1
+        # For stereo: each frame is [left_channel, right_channel] with values between -1 and 1
+        # fps parameter determines how many frames per second are sampled
         audio_samples = list(clip.audio.iter_frames(fps=sample_rate))
-        # self.log.log(f"[grey]🎵 Setting audio sample rate: {sample_rate} Hz. 📊 Got {len(audio_samples)} audio samples[/grey]")
 
         # Convert the list of samples to a NumPy array
         audio_data = np.array(audio_samples)
@@ -99,22 +104,14 @@ def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", meta
     else:
         # TODO: fix duration of audio
         log.log(f"[grey]🎵 Loading audio from file: [bold]{metadata['audio_file']}[/bold][/grey]")
+        
+        # Load audio file using librosa
+        # y: numpy array of shape (n_channels, n_samples)
+        #    - For stereo: y[0] is left channel, y[1] is right channel
+        #    - Values are normalized to [-1, 1] range
+        # sr: integer sample rate in Hz (e.g. 44100, 48000)
         y, sr = librosa.load(metadata["audio_file"], sr=None, mono=False)
         log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sr}[/bold] Hz[/grey]")
         log.log(f"[grey]🔢 Первые 50 значений аудио:[/grey]")
         log.log(f"[grey]{y[:50]}[/grey]")
         return y, sr
-
-    # self.log.log(f"[grey]🔊 Converting audio samples to NumPy array with shape {audio_data.shape}[/grey]")
-    # print(audio_data)
-    # print(audio_data.shape)
-    
-    # print("----------------")
-    # y, sr = librosa.load("Clip1/The Laughing Heart #6.mp3", sr=None, mono=False)
-    # print(y)
-    # print(sr)
-    # print(y.shape)
-    
-    # raise ValueError("STOP!")
-    
-    # return y, sr
