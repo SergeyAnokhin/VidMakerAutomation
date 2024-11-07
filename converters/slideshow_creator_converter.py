@@ -72,6 +72,8 @@ class SlideshowCreatorConverter(BaseConverter):
         fade_in_first_image = transition_config.get('fade_in_first_image', True)  # Default to True
 
         height = self.config.get('slideshow', {}).get('height', 1024)  # Default image height to 1024
+        width = self.config.get('slideshow', {}).get('width', None)  # Default image width to 1024
+        ratio = self.config.get('slideshow', {}).get('ratio', "crop")  # Default to "crop"
         self.log.log(f"[cyan]🖼️ Image height set to: ↕{height} pixels[/cyan]")
 
         self.log.log(f"[cyan]🌟 Transition fade-in duration: ⬆{fade_in_duration}s, fade-out duration: ⬇{fade_out_duration}s[/cyan]")
@@ -94,22 +96,34 @@ class SlideshowCreatorConverter(BaseConverter):
         # Cycle through images repeatedly until the total duration is reached
         while start_time < total_duration:
             for image_file in image_files:
-                self.log.log(f"[cyan]🔂 Loop: {tool.transform_to_MMSS(start_time)} >= {tool.transform_to_MMSS(total_duration)}: [/cyan]")
                 if start_time >= total_duration:
                     break
-                    # self.log.log(table)
-                    # return image_clips
 
                 image_clip = ImageClip(image_file)
                 original_size = (image_clip.w, image_clip.h)
 
+                # Сначала изменяем размер по высоте
                 if image_clip.h != height:
                     new_width = int(image_clip.w * (height / image_clip.h))
                     image_clip = image_clip.resize(height=height)
-                    resized_size = (new_width, height)
-                    self.log.log(f"[yellow]🔄 Resizing image {os.path.basename(image_file)} from ↕{original_size} to ↕{resized_size} pixels[/yellow]")
-                else:
-                    resized_size = original_size
+                    
+                # Обрабатываем ширину
+                if width is not None and image_clip.w != width:
+                    excess_width = image_clip.w - width
+                    if excess_width > 0:
+                        crop_left = excess_width // 2
+                        image_clip = image_clip.crop(x1=crop_left, width=width)
+                        self.log.log(f"[yellow]✂️ Cropping image {os.path.basename(image_file)} to width {width}[/yellow]")
+                    else:
+                        # Добавляем черные полосы по бокам
+                        from moviepy.editor import ColorClip
+                        background = ColorClip(size=(width, height), color=(0,0,0))
+                        background = background.set_duration(duration_per_image)
+                        x_position = (width - image_clip.w) // 2
+                        image_clip = CompositeVideoClip([background, image_clip.set_position((x_position, 0))])
+                        self.log.log(f"[yellow]⬛ Adding black bars to image {os.path.basename(image_file)}[/yellow]")
+
+                resized_size = (image_clip.w, image_clip.h)
 
                 # Determine if the image fits within the total duration
                 if start_time < total_duration:

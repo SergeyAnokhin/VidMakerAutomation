@@ -22,7 +22,8 @@ class VideoExportConverter(BaseConverter):
         if audio_file is None:
             raise FileNotFoundError(f"No mp3 file found in directory: {self.directory}. Cannot determine output file name.")
 
-        output_path = os.path.join(self.directory, f"{audio_file}.mp4")
+        output_file = self.config.get('output_file', f"{audio_file}.mp4")  # Default output path
+        output_path = os.path.join(self.directory, output_file)
 
         # If the output file already exists, append a random timestamp to the file name
         if os.path.exists(output_path):
