@@ -6,7 +6,6 @@ from rich.table import Table
 import numpy as np
 import cv2
 import librosa
-from retrying import retry
 
 console = Console()
 

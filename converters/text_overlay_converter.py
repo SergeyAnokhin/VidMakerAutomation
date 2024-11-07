@@ -5,17 +5,18 @@ from rich.console import Console
 console = Console()
 
 class TextOverlayConverter(BaseConverter):
-    def convert(self, clips, metadata):
+    def convert(self, clip, metadata):
         """
         Adds a text overlay to each video clip in the list.
         If no clips are provided, raises an error.
         """
-        if not clips:
+        if not clip:
             console.print(f"[red]No existing clips found. Cannot add text overlay without clips.[/red]")
             raise ValueError("No existing clips found to add text overlay.")
 
         console.print(f"[bold blue]Processing Text Overlay:[/bold blue] Adding text overlay to clips")
         text = self.config.get('text', 'Default Text')
+        duration = self.config.get('duration', clip.duration)
         position = self.config.get('position', {'x': '10pt', 'y': '10pt'})
         font = self.config.get('font', {'name': 'Arial', 'size': 24, 'color': 'white'})
         contour = self.config.get('contour', {'color': 'black', 'size': 2})
@@ -35,12 +36,10 @@ class TextOverlayConverter(BaseConverter):
             stroke_color=contour['color'],
             stroke_width=contour['size']
         ).set_position((position['x'], position['y'])) \
-        .set_duration(clips[0].duration) \
+        .set_duration(clip.duration) \
         .fadein(fade_in_duration) \
         .fadeout(fade_out_duration)
 
-        updated_clips = []
-        for clip in clips:
-            console.print(f"[green]Adding text overlay to clip with duration {clip.duration} seconds.[/green]")
-            updated_clips.append(CompositeVideoClip([clip, text_clip.set_duration(clip.duration)]))
-        return updated_clips
+        updated_clip = CompositeVideoClip([clip, text_clip.set_duration(clip.duration)])
+        self.log.log(f"[green]Adding text overlay to clip with duration {clip.duration} seconds.[/green]")
+        return updated_clip

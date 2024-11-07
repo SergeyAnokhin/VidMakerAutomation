@@ -71,7 +71,12 @@ def create_converter(converter_type, directory, config, logger: HierarchicalLogg
 if __name__ == "__main__":
     # Set base directory
     base_directory = '.'
+
+    IMAGEMAGICK_BINARY = "D:\\Prog\\ImageMagick\\magick.exe"
     
+    from moviepy.config import change_settings
+    change_settings({"IMAGEMAGICK_BINARY": IMAGEMAGICK_BINARY})
+
     # Get directories to process
     clip_directories = get_clip_directories(base_directory)
     if not clip_directories:
