@@ -31,21 +31,23 @@ tasks:
             fade_in_first_image: false
       - type: "TextOverlayConverter"
         config:
-          text: "Video"
-          duration: 5
+          text: "Your life is Your life"
+          start_time: 1
+          end_time: 9
           position:
-            x: "center" # "50%"  # Position in percentage for horizontal centering
-            y: "center" #  "90%"  # Position in percentage for vertical placement at the bottom
+            # if in pixels, (0, 0) is top left
+            x: "center" # values: center, left, right
+            y: "bottom" # values: center, top, bottom
           font:
-            name: "Arial"
-            size: 48
+            name: "C:/Users/desktop/AppData/Local/Microsoft/Windows/Fonts/Roboto-Bold.ttf" # values: Arial, Times New Roman, Comic Sans MS, Courier New, Georgia, Impact, Lucida Sans Unicode, Palatino Linotype, Tahoma, Trebuchet MS, Verdana
+            size: 70
             color: "white"
           contour:
             color: "black"
             size: 2
           transition:
-            fade_in: 1
-            fade_out: 1
+            fade_in: *fade
+            fade_out: *fade
       # - type: "ImageOverlayConverter"
       #   config:
       #     image:

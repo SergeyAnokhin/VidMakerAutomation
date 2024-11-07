@@ -16,10 +16,16 @@ class TextOverlayConverter(BaseConverter):
 
         console.print(f"[bold blue]Processing Text Overlay:[/bold blue] Adding text overlay to clips")
         text = self.config.get('text', 'Default Text')
-        duration = self.config.get('duration', clip.duration)
+        start_time = self.config.get('start_time', 0)
+        end_time = self.config.get('end_time', clip.duration)
         position = self.config.get('position', {'x': '10pt', 'y': '10pt'})
         font = self.config.get('font', {'name': 'Arial', 'size': 24, 'color': 'white'})
         contour = self.config.get('contour', {'color': 'black', 'size': 2})
+
+        clip_height = clip.size[1]
+        factor = clip_height / 1024
+        font_size = font['size'] * factor
+
 
         transition_config = self.config.get('transition', {})
         fade_in_duration = transition_config.get('fade_in', 0.0)  # Default fade-in to 0.0 seconds
@@ -30,16 +36,17 @@ class TextOverlayConverter(BaseConverter):
 
         text_clip = TextClip(
             text,
-            fontsize=font['size'],
+            fontsize=font_size,
             color=font['color'],
             font=font['name'],
             stroke_color=contour['color'],
             stroke_width=contour['size']
         ).set_position((position['x'], position['y'])) \
-        .set_duration(clip.duration) \
+        .set_end(end_time) \
+        .set_start(start_time) \
         .fadein(fade_in_duration) \
         .fadeout(fade_out_duration)
 
-        updated_clip = CompositeVideoClip([clip, text_clip.set_duration(clip.duration)])
+        updated_clip = CompositeVideoClip([clip, text_clip])
         self.log.log(f"[green]Adding text overlay to clip with duration {clip.duration} seconds.[/green]")
         return updated_clip
