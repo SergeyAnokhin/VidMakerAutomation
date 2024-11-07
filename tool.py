@@ -90,7 +90,7 @@ def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", meta
     log.log(f"[grey]🎵 Using [bold]{type}[/bold] type to load audio[/grey]")
     if type == "moviepy":
         # Extract audio as a NumPy array with the specified sample rate
-        log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sample_rate}[/bold] Hz[/grey]")
+        log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sample_rate}[/bold] Hz.  [bold]{clip.audio.duration}[/bold] seconds. Filename: [bold]{clip.filename}[/bold][/grey]")
         
         # Get audio samples as a list of frames, where each frame is a numpy array
         # For mono audio: each frame is a single float value between -1 and 1
@@ -115,3 +115,17 @@ def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", meta
         log.log(f"[grey]🔢 Первые 50 значений аудио:[/grey]")
         log.log(f"[grey]{y[:50]}[/grey]")
         return y, sr
+
+def get_segment_duration(total_duration, segment_number, total_segments):
+    # Вычисляем длительность одного сегмента
+    segment_length = total_duration // total_segments
+
+    # Определяем начало и конец сегмента
+    start_time = segment_number * segment_length
+    end_time = start_time + segment_length
+
+    # Если это последний сегмент, корректируем конечное время
+    if segment_number == total_segments + 1:
+        end_time = total_duration - 1
+
+    return start_time, end_time

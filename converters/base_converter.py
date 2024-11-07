@@ -4,6 +4,7 @@ from hierarchical_logger import HierarchicalLogger
 from rich.console import Console
 import time
 from tool import transform_to_MMSS
+from moviepy.editor import VideoClip
 
 class BaseConverter(ABC):
     config = {}
@@ -19,8 +20,25 @@ class BaseConverter(ABC):
         self.mylog = logger
         self.log = logger.sub_logger()
 
+    def _convert(self, clip: VideoClip, metadata, index):
+        """
+        Abstract method that all derived converters must implement.
+        This method processes the given clip or list of clips and returns a processed clip or list of clips.
+        :param clip: Video/audio clip or list of clips to process.
+        :param metadata: Common metadata shared between converters.
+        :return: Processed clip or list of processed clips.
+        """
+        time.sleep(index * 10.0)
+        # Клонируем метаданные для каждого клипа
+        metadata = metadata.copy()
+        metadata["index"] = index
+
+        result = self.convert(clip, metadata)
+        result.filename = clip.filename
+        return result
+
     @abstractmethod
-    def convert(self, clip, metadata):
+    def convert(self, clip: VideoClip, metadata):
         """
         Abstract method that all derived converters must implement.
         This method processes the given clip or list of clips and returns a processed clip or list of clips.
@@ -30,18 +48,16 @@ class BaseConverter(ABC):
         """
         pass
 
-    def convert_async(self, clips, metadata, method):
-        """
-        Convert a single clip synchronously.
-        """
+    def process_async(self, clips, metadata, method):
         converter_name = self.__class__.__name__
         with ThreadPoolExecutor() as executor:
             self.mylog.log(f"{converter_name}: [blue]Multiple clips detected, processing in parallel[/blue]")
             self.log_clip_conversion(converter_name)
-            results = list(executor.map(lambda clip: method(clip, metadata), clips))
+            func = lambda clip, i: method(clip, metadata, i)
+            results = list(executor.map(func, clips, range(len(clips))))
         return results
 
-    def process(self, clips, metadata):
+    def process(self, clips: list[VideoClip], metadata):
         """
         Manages single or multi-clip processing.
         If more than one clip is provided, runs the processing in parallel.
@@ -53,7 +69,7 @@ class BaseConverter(ABC):
         converter_name = self.__class__.__name__
 
         if len(clips) > 1:
-            return self.convert_async(clips, metadata, self.convert)
+            return self.process_async(clips, metadata, self._convert)
         else:
             self.mylog.log(f"{converter_name}: [blue]Single clip detected, processing sequentially[/blue]")
             self.log_clip_conversion(converter_name)

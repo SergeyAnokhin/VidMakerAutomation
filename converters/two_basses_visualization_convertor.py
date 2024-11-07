@@ -6,6 +6,7 @@ from rich.table import Table
 import numpy as np
 import cv2
 import librosa
+import time
 
 console = Console()
 
@@ -58,10 +59,10 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         equalizer_clip = equalizer_clip.set_opacity(0.2)  # Опционально: установить прозрачность
         tool.inspect_clip("equalizer_clip", equalizer_clip, self.log)
 
-        clip = CompositeVideoClip([clip, equalizer_clip])
-        tool.inspect_clip("clip", clip, self.log)
+        composite_clip = CompositeVideoClip([clip, equalizer_clip])
+        tool.inspect_clip("composite_clip", composite_clip, self.log)
 
-        return clip
+        return composite_clip
     
 
         
@@ -152,15 +153,25 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
         amp_factor = 0.15
         frequency_bands = [
-            {'band': (20, 80), 'amplification': 1.0 * amp_factor},
-            {'band': (80, 255), 'amplification': 3.0 * amp_factor}, # humain voice band
-            {'band': (255, 500), 'amplification': 3.0 * amp_factor},
-            {'band': (500, 8000), 'amplification': 40.0 * amp_factor},
+            {'band': (20, 80), 'amplification': 3.0 * amp_factor},
+            {'band': (80, 255), 'amplification': 2.0 * amp_factor}, # humain voice band
+            {'band': (255, 500), 'amplification': 0.00 * amp_factor},
+            {'band': (500, 8000), 'amplification': 0.00 * amp_factor},
         ]
         # Load audio file
         # y, sr = librosa.load(audio_file, sr=None, mono=False)
         sample_rate = self.config.get('audio', {}).get('sample_rate', 48000)
-        y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
+
+        try:
+            y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
+        except Exception as e:
+            self.log.warn(f"[yellow]Error loading audio from {clip.filename} : {e}. Trying to load from file...[/yellow]")
+            time.sleep(10)
+            try:    
+                y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
+            except Exception as e:
+                self.log.error(f"[red]Error loading audio from {clip.filename} : {e}[/red]")
+                return clip
 
         self.log.log(f"[grey]🎨Used colormap: {tool.get_colormap_name(colormap)}[/grey]")        
         self.log.log(f"[grey]🔊Used frequency bands: [/grey]")        

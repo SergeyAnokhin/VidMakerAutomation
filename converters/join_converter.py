@@ -2,8 +2,7 @@ import os
 from .base_converter import BaseConverter
 from moviepy.editor import concatenate_videoclips, VideoFileClip
 from rich.console import Console
-import tempfile
-import uuid
+from moviepy.editor import VideoClip
 
 console = Console()
 
@@ -44,12 +43,12 @@ class JoinConverter(BaseConverter):
         temp_files = []
 
         # Save each clip as a temporary file
-        temp_files = self.convert_async(clips, metadata, self.convert)
+        temp_files = self.process_async(clips, metadata, self.convert)
 
         # Load temporary files and concatenate
         console.print(temp_files)
         video_clips = [VideoFileClip(f) for f in temp_files]
-        joined_clip = concatenate_videoclips(video_clips)
+        joined_clip = concatenate_videoclips(video_clips, method="compose")
         console.print(f"[green]Successfully joined {len(video_clips)} clips into a single clip with duration {joined_clip.duration} seconds.[/green]")
 
         # Clean up temporary files after concatenation
@@ -59,11 +58,10 @@ class JoinConverter(BaseConverter):
 
         return [joined_clip]
 
-    def convert(self, clip, metadata):
-        clip_uuid = str(uuid.uuid4())
-        temp_filename = os.path.join(self.directory, f"temp_clip_{clip_uuid}.mp4")
-        console.print(f"[yellow]Saving clip as temporary file: {temp_filename}. Clip duration: [bold]{clip.duration}[/bold] secs [/yellow]")
-        console.print(f"[grey]🎥 Saving with parameters: fps=[bold]{self.fps}[/bold], codec=[bold]{self.codec}[/bold], preset=[bold]{self.preset}[/bold][/grey]")
+    def convert(self, clip: VideoClip, metadata, index):
+        temp_filename = os.path.join(self.directory, clip.filename)
+        self.log.log(f"[yellow]Saving clip as temporary file: {temp_filename}. Clip duration: [bold]{clip.duration}[/bold] secs [/yellow]")
+        self.log.log(f"[grey]🎥 Saving with parameters: fps=[bold]{self.fps}[/bold], codec=[bold]{self.codec}[/bold], preset=[bold]{self.preset}[/bold][/grey]")
         if clip.audio is None or clip.audio.duration is None:
             self.log.log("[yellow]⚠️ Clip does not contain audio or audio duration is missing[/yellow]")
         else:

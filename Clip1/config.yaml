@@ -66,13 +66,13 @@ tasks:
       #       bar_width: 20
       #       spacing: 10
       #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-      # - type: "TwoSpotsVisualizationConverter"
-      #   config:
-      #     audio:
-      #       sample_rate: 48000
-      #     visualization:
-      #       fps: *default_fps
-      #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
+      - type: "TwoSpotsVisualizationConverter"
+        config:
+          audio:
+            sample_rate: 10000
+          visualization:
+            fps: *default_fps
+            colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
       - type: "JoinConverter"
         confug:
           quality: *quality
