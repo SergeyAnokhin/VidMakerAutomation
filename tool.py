@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from moviepy.editor import VideoClip
 import librosa  
-
+from model import AudioPart
 
 def transform_to_MMSS(seconds: int) -> str:
     return time.strftime('%M:%S', time.gmtime(seconds))
@@ -62,7 +62,7 @@ def inspect_clip(name, clip, log, debug=False):
         log.log("🎨 This clip is RGB (no transparency).")
     log.log("[bold blue]==============================[/bold blue]")
 
-def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", metadata=None, sample_rate=None):
+def load_audio_from_videoclip(clip: VideoClip, log, type="librosa", metadata=None, sample_rate=None, audio_part:AudioPart =None):
     """
     Extracts audio from a video clip and returns it in a format compatible with librosa.load or moviepy output.
 
@@ -103,22 +103,27 @@ def load_audio_from_videoclip(clip: VideoClip, log, fps=24, type="moviepy", meta
         return audio_data.T, sample_rate    
     else:
         # TODO: fix duration of audio
-        log.log(f"[grey]🎵 Loading audio from file: [bold]{metadata['audio_file']}[/bold][/grey]")
+        log.log(f"[grey]🎵 Loading audio from file: [bold]{audio_part.audio_file}[/bold][/grey]")
         
         # Load audio file using librosa
         # y: numpy array of shape (n_channels, n_samples)
         #    - For stereo: y[0] is left channel, y[1] is right channel
         #    - Values are normalized to [-1, 1] range
         # sr: integer sample rate in Hz (e.g. 44100, 48000)
-        y, sr = librosa.load(metadata["audio_file"], sr=None, mono=False)
+
+        offset = audio_part.offset
+        duration = audio_part.duration  
+
+        log.log(f"[grey]🎵 Loading audio from file: [bold]{audio_part.audio_file}[/bold]. Offset: [bold]{offset}[/bold], Duration: [bold]{duration}[/bold][/grey]")
+        y, sr = librosa.load(audio_part.audio_file, sr=None, mono=False, offset=offset, duration=duration)
         log.log(f"[grey]🎵 Loaded audio with sample rate: [bold]{sr}[/bold] Hz[/grey]")
-        log.log(f"[grey]🔢 Первые 50 значений аудио:[/grey]")
-        log.log(f"[grey]{y[:50]}[/grey]")
+        # log.log(f"[grey]🔢 First 50 values of audio:[/grey]")
+        # log.log(f"[grey]{y[:50]}[/grey]")
         return y, sr
 
 def get_segment_duration(total_duration, segment_number, total_segments):
     # Вычисляем длительность одного сегмента
-    segment_length = total_duration // total_segments
+    segment_length = total_duration / total_segments
 
     # Определяем начало и конец сегмента
     start_time = segment_number * segment_length

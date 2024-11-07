@@ -94,7 +94,7 @@ class SlideshowCreatorConverter(BaseConverter):
         # Cycle through images repeatedly until the total duration is reached
         while start_time < total_duration:
             for image_file in image_files:
-                # self.log.log(f"[cyan]🔂 Loop:{start_time} -> {total_duration} [/cyan]")
+                self.log.log(f"[cyan]🔂 Loop: {tool.transform_to_MMSS(start_time)} >= {tool.transform_to_MMSS(total_duration)}: [/cyan]")
                 if start_time >= total_duration:
                     break
                     # self.log.log(table)
@@ -112,7 +112,7 @@ class SlideshowCreatorConverter(BaseConverter):
                     resized_size = original_size
 
                 # Determine if the image fits within the total duration
-                if start_time + duration_per_image <= total_duration:
+                if start_time < total_duration:
                     # Image fits within the total duration
                     image_clip = image_clip.set_duration(duration_per_image)
                     if index == 1 and not fade_in_first_image:

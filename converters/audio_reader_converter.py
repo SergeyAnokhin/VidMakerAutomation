@@ -36,6 +36,8 @@ class AudioReaderConverter(BaseConverter):
         if start_time != 0 or end_time is not None:
             self.log.log(f"[cyan]✂️ Cropping audio from {start_time} to {end_time} seconds[/cyan]")
             audio_clip = AudioFileClip(audio_file).subclip(start_time, end_time)
+            metadata["start_time"] = start_time
+            metadata["end_time"] = end_time
         else:
             audio_clip = AudioFileClip(audio_file)
 

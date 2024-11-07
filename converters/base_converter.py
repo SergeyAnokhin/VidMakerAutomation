@@ -28,17 +28,17 @@ class BaseConverter(ABC):
         :param metadata: Common metadata shared between converters.
         :return: Processed clip or list of processed clips.
         """
-        time.sleep(index * 10.0)
+        time.sleep(index * 1.0)
         # Клонируем метаданные для каждого клипа
         metadata = metadata.copy()
         metadata["index"] = index
 
-        result = self.convert(clip, metadata)
+        result = self.convert(clip, metadata, index)
         result.filename = clip.filename
         return result
 
     @abstractmethod
-    def convert(self, clip: VideoClip, metadata):
+    def convert(self, clip: VideoClip, metadata: dict, index: int = 0):
         """
         Abstract method that all derived converters must implement.
         This method processes the given clip or list of clips and returns a processed clip or list of clips.

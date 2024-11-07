@@ -73,6 +73,6 @@ class JoinConverter(BaseConverter):
             codec=self.codec,
             preset=self.preset,
             audio=False,
-            threads=4  
+            threads=1  
         )
         return temp_filename

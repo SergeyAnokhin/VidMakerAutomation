@@ -6,12 +6,12 @@ from rich.table import Table
 import numpy as np
 import cv2
 import librosa
-import time
+from retrying import retry
 
 console = Console()
 
 class TwoSpotsVisualizationConverter(BaseConverter):
-    def convert(self, clip: VideoClip, metadata):
+    def convert(self, clip: VideoClip, metadata, index: int):
         """
         Adds an audio visualization overlay to each video clip in the list.
         If no clips are provided, raises an error.
@@ -48,7 +48,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         tool.inspect_clip("clip", clip, self.log)
 
         # all color maps : https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-        equalizer_clip = self.create_equalizer_clip(clip, size=clip.size,
+        equalizer_clip = self.create_equalizer_clip(clip, size=clip.size, index=index,
                             colormap=colormap, debug_mode=False, fps=fps, metadata=metadata)        
         tool.inspect_clip("equalizer_clip", equalizer_clip, self.log)
 
@@ -64,10 +64,16 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         return composite_clip
     
-
+    # @retry(stop_max_attempt_number=5, wait_fixed=5000)
+    def load_audio(self, clip, audio_part, sample_rate):
+        # try:
+            return tool.load_audio_from_videoclip(clip, self.log, audio_part=audio_part, sample_rate=sample_rate)
+        # except Exception as e:
+        #     self.log.warn(f"[yellow]Error loading audio from {clip.filename} : {e}. Trying again...[/yellow]")
+        #     raise e
         
     # all color maps : https://learnopencv.com/wp-content/uploads/2015/07/colormap_opencv_example.jpg
-    def create_equalizer_clip(self, clip: VideoClip, fps, size, colormap=cv2.COLORMAP_JET,
+    def create_equalizer_clip(self, clip: VideoClip, fps, size, index, colormap=cv2.COLORMAP_JET,
                             debug_mode=False, metadata=None):
         
         # circle_radius=300,
@@ -102,7 +108,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         #   /     ○    \  <- Center dot expands/contracts with beat
         #  |   ●●●●●●   | 
         #   \__________/
-        center_dot_size=35 * resize_factor
+        center_dot_size=20 * resize_factor
 
         # Size in pixels of the smaller dots around the circle edge
         # Example:
@@ -151,48 +157,29 @@ class TwoSpotsVisualizationConverter(BaseConverter):
 
         # Создаем эквалайзерный клип
         # Настройка диапазонов частот для каждой из четырех суб-точек с усилением
-        amp_factor = 0.15
         frequency_bands = [
-            {'band': (20, 80), 'amplification': 3.0 * amp_factor},
-            {'band': (80, 255), 'amplification': 2.0 * amp_factor}, # humain voice band
-            {'band': (255, 500), 'amplification': 0.00 * amp_factor},
-            {'band': (500, 8000), 'amplification': 0.00 * amp_factor},
+            {'band': (20, 80), 'amplification': 0.2}, # blue
+            {'band': (80, 255), 'amplification': 1.0}, # light blue # humain voice band 
+            {'band': (255, 500), 'amplification': 1.0}, # yellow
+            {'band': (500, 8000), 'amplification': 4.00}, # red
         ]
         # Load audio file
         # y, sr = librosa.load(audio_file, sr=None, mono=False)
         sample_rate = self.config.get('audio', {}).get('sample_rate', 48000)
 
-        try:
-            y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
-        except Exception as e:
-            self.log.warn(f"[yellow]Error loading audio from {clip.filename} : {e}. Trying to load from file...[/yellow]")
-            time.sleep(10)
-            try:    
-                y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
-            except Exception as e:
-                self.log.error(f"[red]Error loading audio from {clip.filename} : {e}[/red]")
-                return clip
+        # try:
+        audio_part = metadata["audio_parts"][index]
+        y, sr = self.load_audio(clip, audio_part, sample_rate)
+        # except Exception as e:
+        #     self.log.warn(f"[yellow]Error loading audio from {clip.filename} : {e}. Trying to load from file...[/yellow]")
+        #     time.sleep(10)
+        #     try:    
+        #         y, sr = tool.load_audio_from_videoclip(clip, self.log, fps, metadata=metadata, sample_rate=sample_rate)
+        #     except Exception as e:
+        #         self.log.error(f"[red]Error loading audio from {clip.filename} : {e}[/red]")
+        #         return clip
 
         self.log.log(f"[grey]🎨Used colormap: {tool.get_colormap_name(colormap)}[/grey]")        
-        self.log.log(f"[grey]🔊Used frequency bands: [/grey]")        
-        table = Table()
-        table.add_column("↔Range", justify="center")
-        table.add_column("⏫Amplification", justify="center") 
-        table.add_column("↔Range", justify="center")
-        table.add_column("⏫Amplification", justify="center")
-        table.add_row(
-            f"{frequency_bands[0]['band'][0]}-{frequency_bands[0]['band'][1]} Hz",
-            str(frequency_bands[0].get('amplification', 1.0)),
-            f"{frequency_bands[1]['band'][0]}-{frequency_bands[1]['band'][1]} Hz", 
-            str(frequency_bands[1].get('amplification', 1.0))
-        )
-        table.add_row(
-            f"{frequency_bands[2]['band'][0]}-{frequency_bands[2]['band'][1]} Hz",
-            str(frequency_bands[2].get('amplification', 1.0)),
-            f"{frequency_bands[3]['band'][0]}-{frequency_bands[3]['band'][1]} Hz",
-            str(frequency_bands[3].get('amplification', 1.0))
-        )
-        self.log.print(table)
 
         # Ensure audio is stereo
         if y.ndim == 1:
@@ -220,6 +207,20 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         # Extract amplitudes for each frequency band with amplification
         band_amplitudes_left = []
         band_amplitudes_right = []
+        table = Table()
+        table.add_column("↔Range", justify="center")
+        table.add_column("⏫Amplification", justify="center")
+        table.add_column("Max Left", justify="center")
+        table.add_column("Median Left", justify="center")
+        table.add_column("Max Right", justify="center")
+        table.add_column("Median Right", justify="center")
+        table.add_column("Normalized Weight", justify="center")
+
+        total_max_left = 0
+        total_max_right = 0
+
+        band_data = []
+
         for band_info in frequency_bands:
             band = band_info['band']
             amplification = band_info.get('amplification', 1.0)
@@ -227,6 +228,47 @@ class TwoSpotsVisualizationConverter(BaseConverter):
             amp_right = aggregate_band_amplitude(S_right, band) * amplification
             band_amplitudes_left.append(amp_left)
             band_amplitudes_right.append(amp_right)
+            
+            # Calculate max and median values
+            max_left = np.max(amp_left)
+            median_left = np.median(amp_left)
+            max_right = np.max(amp_right)
+            median_right = np.median(amp_right)
+            
+            # Summarize max values
+            total_max_left += max_left
+            total_max_right += max_right
+
+            # Store data in array
+            band_data.append({
+                "band": f"{band[0]}-{band[1]} Hz",
+                "amplification": str(amplification),
+                "max_left": f"{max_left:.2f}",
+                "median_left": f"{median_left:.2f}",
+                "max_right": f"{max_right:.2f}",
+                "median_right": f"{median_right:.2f}",
+                "normalized_weight": ""  # Placeholder for normalized weight
+            })
+        
+        # Normalize and update the table with weights
+        for i, band_info in enumerate(frequency_bands):
+            max_left = np.max(band_amplitudes_left[i])
+            max_right = np.max(band_amplitudes_right[i])
+            normalized_weight = ((max_left / total_max_left) + (max_right / total_max_right)) / 2
+            band_data[i]["normalized_weight"] = f"{normalized_weight:.2f}"
+
+            # Add row to the table
+            table.add_row(
+                band_data[i]["band"],
+                band_data[i]["amplification"],
+                band_data[i]["max_left"],
+                band_data[i]["median_left"],
+                band_data[i]["max_right"],
+                band_data[i]["median_right"],
+                band_data[i]["normalized_weight"]
+            )
+
+        self.log.print(table)
 
         # Normalize amplitudes
         max_amp = max([band.max() for band in band_amplitudes_left + band_amplitudes_right])
@@ -445,7 +487,7 @@ class TwoSpotsVisualizationConverter(BaseConverter):
         hop_length = int(sr / fps)
         n_fft = 4096  # Увеличиваем FFT для лучшего разрешения по частоте
 
-        # Получаем спектрограммы для левого и правого каналов
+        # Получаем спектрограммы для лево��о и правого каналов
         S_left = np.abs(librosa.stft(y[0], n_fft=n_fft, hop_length=hop_length))
         S_right = np.abs(librosa.stft(y[1], n_fft=n_fft, hop_length=hop_length))
 
