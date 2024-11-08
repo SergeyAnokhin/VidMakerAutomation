@@ -20,6 +20,7 @@ class SplitConverter(BaseConverter):
         num_parts = self.config.get('parts', 3)  # Default to 3 parts if not specified
         split_clips = []
         metadata["parts"] = num_parts
+        audio_parts = metadata["audio_parts"][0]
         metadata["audio_parts"] = []
 
         for clip in clips:
@@ -30,7 +31,7 @@ class SplitConverter(BaseConverter):
                 subclip: VideoClip = clip.subclip(start_time, end_time)
                 self.log.log(f"[green]Subclip [bold]{i+1}[/bold] created with duration [{tool.transform_to_MMSS(subclip.duration)}] seconds. Period: [bold]{tool.transform_to_MMSS(start_time)} - {tool.transform_to_MMSS(end_time)}[/bold][/green]")
                 subclip.filename = f"subclip_{i+1}.avi"
-                metadata["audio_parts"].append(AudioPart(start_time, end_time, metadata["audio_file"]))
+                metadata["audio_parts"].append(AudioPart(start_time, end_time, audio_parts.filename))
                 split_clips.append(subclip)
 
         return split_clips

@@ -4,7 +4,7 @@ import os
 import time
 
 class VideoExportConverter(BaseConverter):
-    def convert(self, clip, metadata):
+    def convert(self, clip, metadata, index: int):
         """
         Exports the final video clip to a file.
         If no clip is provided, raises an error.

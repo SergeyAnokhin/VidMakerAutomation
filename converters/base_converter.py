@@ -74,7 +74,7 @@ class BaseConverter(ABC):
             self.mylog.log(f"{converter_name}: [blue]Single clip detected, processing sequentially[/blue]")
             self.log_clip_conversion(converter_name)
             first_clip = clips[0] if len(clips) > 0 else None
-            results = [self.convert(first_clip, metadata)]
+            results = [self.convert(first_clip, metadata, 0)]
 
         self.log_execution_time(start_time)
         return results

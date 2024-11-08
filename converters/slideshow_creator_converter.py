@@ -10,7 +10,7 @@ import time
 console = Console()
 
 class SlideshowCreatorConverter(BaseConverter):
-    def convert(self, clip: VideoClip, metadata):
+    def convert(self, clip: VideoClip, metadata, index: int):
         """
         Creates a slideshow from images in the directory and adds it to the clip.
         If no clip is provided, creates a new video clip from the images.

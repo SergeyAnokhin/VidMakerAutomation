@@ -7,9 +7,9 @@ import librosa
 import numpy as np
 from rich.table import Table
 console = Console()
-
+from model import AudioPart
 class AudioReaderConverter(BaseConverter):
-    def convert(self, clip, metadata):
+    def convert(self, clip, metadata, index: int):
         """
         Reads an audio file from the directory and adds it to the clip.
         If no clip is provided, creates a new audio clip from the audio file.
@@ -36,9 +36,7 @@ class AudioReaderConverter(BaseConverter):
         if start_time != 0 or end_time is not None:
             self.log.log(f"[cyan]✂️ Cropping audio from {start_time} to {end_time} seconds[/cyan]")
             audio_clip = AudioFileClip(audio_file).subclip(start_time, end_time)
-            metadata["start_time"] = start_time
-            metadata["end_time"] = end_time
-            metadata["audio_file"] = audio_file
+            metadata["audio_parts"] = [AudioPart(start_time, end_time, audio_file)]
         else:
             audio_clip = AudioFileClip(audio_file)
 

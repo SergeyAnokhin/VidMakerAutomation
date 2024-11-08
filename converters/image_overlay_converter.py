@@ -8,7 +8,7 @@ import tool
 console = Console()
 
 class ImageOverlayConverter(BaseConverter):
-    def convert(self, clip, metadata):
+    def convert(self, clip, metadata, index: int):
         """
         Adds an image overlay to each video clip in the list.
         If no clips are provided, raises an error.
