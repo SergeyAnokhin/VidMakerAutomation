@@ -50,6 +50,9 @@ def process_directory(directory, tasks):
             else:
                 console.print(f"[red]Unknown converter type: {converter_type}[/red]")
 
+        # for clip in clips:
+        #     clip.close()
+
 # Create converter instance
 def create_converter(converter_type, directory, config, logger: HierarchicalLogger):
     converter_map = {

@@ -38,7 +38,7 @@ class BaseConverter(ABC):
         return result
 
     @abstractmethod
-    def convert(self, clip: VideoClip, metadata: dict, index: int = 0):
+    def convert(self, clip: VideoClip, metadata: dict, index: int = 0) -> VideoClip:
         """
         Abstract method that all derived converters must implement.
         This method processes the given clip or list of clips and returns a processed clip or list of clips.

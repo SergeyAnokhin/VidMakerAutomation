@@ -58,7 +58,9 @@ class ImageOverlayConverter(BaseConverter):
 
         if start_time < 0:
             start_time = max(0, audio_duration + start_time)
-            
+
+        duration = min(duration, audio_duration - start_time - 2)
+
         if position is None:
             position = ("left", "bottom")
         else:
@@ -94,5 +96,4 @@ class ImageOverlayConverter(BaseConverter):
         final_video = CompositeVideoClip([slideshow, gif_clip])
         tool.inspect_clip("final_video", final_video, self.log)   
 
-        gif_clip.close()
         return final_video

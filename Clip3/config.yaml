@@ -13,8 +13,8 @@ fade: &fade 0.2
 image_duration: &image_duration 10
 image_height: &image_height 256  
 crop: &crop
-  # start_time: 0
-  # end_time: 10  # End of the audio
+  start_time: 0
+  end_time: 10  # End of the audio
 
 tasks:
   - name: "Create Full Length Video"
@@ -58,8 +58,8 @@ tasks:
               x: "left" # values: left, center, right
               y: "bottom" # values: top, center, bottom
           timing:
-            start_time: -32
-            duration: 31
+            start_time: -5 #-32
+            duration: 1 #31
       - type: "SplitConverter"
         config:
           parts: 6
@@ -95,7 +95,7 @@ tasks:
       - type: "AudioReaderConverter"
         config:
           start_time: 6
-          end_time: 51  # Duration of 30 seconds
+          end_time: 16 # 51  # Duration of 30 seconds
       - type: "SlideshowCreatorConverter"
         config:
           slideshow:
@@ -116,9 +116,9 @@ tasks:
           timing:
             start_time: -16
             duration: 15    
-      - type: "SplitConverter"
-        config:
-          parts: 6                    
+      # - type: "SplitConverter"
+      #   config:
+      #     parts: 6                    
       - type: "TwoSpotsVisualizationConverter"
         config:
           audio:
@@ -127,8 +127,8 @@ tasks:
             fps: *default_fps
             # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
             colormap: "COLORMAP_AUTUMN" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
-      - type: "JoinConverter"
-        config: *quality
+      # - type: "JoinConverter"
+      #   config: *quality
       - type: "VideoExportConverter"
         config:
           output_file: "short_output.mp4"
