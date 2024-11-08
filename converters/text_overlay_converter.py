@@ -48,5 +48,6 @@ class TextOverlayConverter(BaseConverter):
         .fadeout(fade_out_duration)
 
         updated_clip = CompositeVideoClip([clip, text_clip])
+        updated_clip.filename = clip.filename
         self.log.log(f"[green]Adding text overlay to clip with duration {clip.duration} seconds.[/green]")
         return updated_clip

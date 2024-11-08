@@ -38,6 +38,7 @@ class AudioReaderConverter(BaseConverter):
             audio_clip = AudioFileClip(audio_file).subclip(start_time, end_time)
             metadata["start_time"] = start_time
             metadata["end_time"] = end_time
+            metadata["audio_file"] = audio_file
         else:
             audio_clip = AudioFileClip(audio_file)
 
