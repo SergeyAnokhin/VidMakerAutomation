@@ -93,4 +93,6 @@ class ImageOverlayConverter(BaseConverter):
         
         final_video = CompositeVideoClip([slideshow, gif_clip])
         tool.inspect_clip("final_video", final_video, self.log)   
+
+        gif_clip.close()
         return final_video

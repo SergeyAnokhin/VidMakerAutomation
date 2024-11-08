@@ -11,4 +11,8 @@ class AudioPart:
         self.sample_rate = sample_rate
 
         self.offset = start_time
-        self.duration = end_time - start_time
+
+        if end_time is not None:
+            self.duration = end_time - start_time
+        else:
+            self.duration = None

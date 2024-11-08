@@ -42,4 +42,5 @@ class VideoExportConverter(BaseConverter):
         # Export the video clip
         clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset, threads=4)
 
+        clip.close()
         return clip
