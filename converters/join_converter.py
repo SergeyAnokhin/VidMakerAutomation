@@ -75,4 +75,6 @@ class JoinConverter(BaseConverter):
             audio=False,
             threads=1
         )
+        
+        # clip.close()
         return temp_filename

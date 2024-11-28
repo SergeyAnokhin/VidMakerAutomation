@@ -17,7 +17,8 @@ class SlideshowCreatorConverter(BaseConverter):
         """
         self.log.log("[bold blue]🚀 Starting Slideshow Creation...[/bold blue]")
         
-        cover_name = self.config.get('cover_name', None)  
+        cover = self.config.get('cover', {})  
+        cover_name = cover.get('name', None)  
         image_files = [
             os.path.join(self.directory, f) for f in sorted(os.listdir(self.directory))
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.jfif', '.webp')) and not f.lower().startswith(cover_name or "cover")
@@ -77,7 +78,10 @@ class SlideshowCreatorConverter(BaseConverter):
         width = self.config.get('slideshow', {}).get('width', None)  # Default image width to 1024
         # ratio = self.config.get('slideshow', {}).get('ratio', "crop")  # Default to "crop"
         self.log.log(f"[cyan]🖼️ Image height set to: ↕{height} pixels[/cyan]")
-        cover_name = self.config.get('cover_name', None)  
+        cover = self.config.get('cover', {})  
+        cover_name = cover.get('name', None)  
+        cover_duration = cover.get('duration', duration_per_image or 5)  
+        self.log.log(f"[cyan]🖼 cover name: {cover_name} Duration: ⌛{cover_duration} [/cyan]")
         self.log.log(f"[cyan]🌟 Transition fade-in duration: ⬆{fade_in_duration}s, fade-out duration: ⬇{fade_out_duration}s[/cyan]")
         
         # Initialize table for detailed image information
@@ -101,9 +105,9 @@ class SlideshowCreatorConverter(BaseConverter):
                 if f.lower().endswith(('.png', '.jpg', '.jpeg', '.jfif', '.webp')) and f.lower().startswith(cover_name)
             ]                
             if len(cover_file) == 1:
-                result = self._process_image(duration_per_image, total_duration, fade_in_duration, fade_out_duration, fade_in_first_image, height, width, table, start_time, index, cover_file[0])
+                result = self._process_image(cover_duration, total_duration, fade_in_duration, fade_out_duration, fade_in_first_image, height, width, table, start_time, index, cover_file[0])
                 index += 1            
-                start_time += duration_per_image
+                start_time += cover_duration
                 image_clips.append(result)
             
         

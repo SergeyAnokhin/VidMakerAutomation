@@ -53,6 +53,7 @@ class AudioReaderConverter(BaseConverter):
         clip = clip.set_audio(audio_clip)
         metadata["audio_file"] = audio_file
 
+        # audio_clip.close()
         return clip
 
 

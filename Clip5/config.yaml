@@ -23,6 +23,7 @@ tasks:
         config: *crop
       - type: "SlideshowCreatorConverter"
         config:
+          cover_name: cover        
           slideshow:
             height: *image_height  # Height of the images to be unified
             duration: *image_duration
@@ -78,7 +79,7 @@ tasks:
           visualization:
             fps: *default_fps
             # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-            colormap: "COLORMAP_AUTUMN" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
+            colormap: "COLORMAP_JET" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
       - type: "JoinConverter"
         config: *quality
           # fps: *default_fps
@@ -90,49 +91,49 @@ tasks:
         config:
           quality: *quality
 
-  - name: "Create YouTube Short"
-    converters:
-      - type: "AudioReaderConverter"
-        config:
-          start_time: 8
-          end_time: 56  # Duration of 30 seconds
-      - type: "SlideshowCreatorConverter"
-        config:
-          slideshow:
-            height: *image_height  # Height for YouTube Short format
-            width: 600
-            ratio: crop # or resize 
-          transition:
-            fade_in: *fade  
-            fade_out: *fade
-      - type: "ImageOverlayConverter"
-        config:
-          image:
-            path: "static/animated2.gif"
-            resize: 1
-            position:
-              x: "right" # values: left, center, right
-              y: "top" # values: top, center, bottom
-          timing:
-            start_time: -16
-            duration: 15    
-      # - type: "SplitConverter"
-      #   config:
-      #     parts: 6                    
-      - type: "TwoSpotsVisualizationConverter"
-        config:
-          audio:
-            sample_rate: 10000
-          visualization:
-            fps: *default_fps
-            # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-            colormap: "COLORMAP_AUTUMN" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
-      # - type: "JoinConverter"
-      #   config: *quality
-      - type: "VideoExportConverter"
-        config:
-          output_file: "short_output.mp4"
-          quality:
-            fps: *default_fps
-            codec: "libx264"
-            quality_preset: "medium"
+  # - name: "Create YouTube Short"
+  #   converters:
+  #     - type: "AudioReaderConverter"
+  #       config:
+  #         start_time: 8
+  #         end_time: 56  # Duration of 30 seconds
+  #     - type: "SlideshowCreatorConverter"
+  #       config:
+  #         slideshow:
+  #           height: *image_height  # Height for YouTube Short format
+  #           width: 600
+  #           ratio: crop # or resize 
+  #         transition:
+  #           fade_in: *fade  
+  #           fade_out: *fade
+  #     - type: "ImageOverlayConverter"
+  #       config:
+  #         image:
+  #           path: "static/animated2.gif"
+  #           resize: 1
+  #           position:
+  #             x: "right" # values: left, center, right
+  #             y: "top" # values: top, center, bottom
+  #         timing:
+  #           start_time: -16
+  #           duration: 15    
+  #     # - type: "SplitConverter"
+  #     #   config:
+  #     #     parts: 6                    
+  #     - type: "TwoSpotsVisualizationConverter"
+  #       config:
+  #         audio:
+  #           sample_rate: 10000
+  #         visualization:
+  #           fps: *default_fps
+  #           # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
+  #           colormap: "COLORMAP_AUTUMN" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
+  #     # - type: "JoinConverter"
+  #     #   config: *quality
+  #     - type: "VideoExportConverter"
+  #       config:
+  #         output_file: "short_output.mp4"
+  #         quality:
+  #           fps: *default_fps
+  #           codec: "libx264"
+  #           quality_preset: "medium"
