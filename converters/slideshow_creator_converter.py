@@ -56,7 +56,11 @@ class SlideshowCreatorConverter(BaseConverter):
 
         if clip.h != image_clips[0].h or clip.w != image_clips[0].w:
             original_clip_size = (clip.w, clip.h)
-            clip = clip.resize(height=image_clips[0].h).crop(0, 0, width=image_clips[0].w, height=image_clips[0].h)
+            self.log.log(f"[yellow]🔄 First image size ↔{image_clips[0].w} ↕{image_clips[0].h} pixels[/yellow]")
+            if image_clips[0].w > clip.w:
+                clip = clip.resize(width=image_clips[0].w).crop(0, 0, width=image_clips[0].w, height=image_clips[0].h)
+            else:
+                clip = clip.resize(height=image_clips[0].h).crop(0, 0, width=image_clips[0].w, height=image_clips[0].h)
             resized_clip_size = (clip.w, clip.h)
             self.log.log(f"[yellow]🔄 Resizing and cropping incoming clip from {original_clip_size} to {resized_clip_size} pixels[/yellow]")
 

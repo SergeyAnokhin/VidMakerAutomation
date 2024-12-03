@@ -48,8 +48,10 @@ class JoinConverter(BaseConverter):
         # Load temporary files and concatenate
         console.print(temp_files)
         video_clips = [VideoFileClip(f) for f in temp_files]
+        console.print(f"First clip size: ↔{video_clips[0].w} ↕{video_clips[0].h} ")
         joined_clip = concatenate_videoclips(video_clips, method="compose")
         console.print(f"[green]Successfully joined {len(video_clips)} clips into a single clip with duration {joined_clip.duration} seconds.[/green]")
+        console.print(f"Joined clip size: ↔{joined_clip.w} ↕{joined_clip.h} ")
 
         # Clean up temporary files after concatenation
         # for file in temp_files:
