@@ -17,11 +17,9 @@ class SlideshowCreatorConverter(BaseConverter):
         """
         self.log.log("[bold blue]🚀 Starting Slideshow Creation...[/bold blue]")
         
-        cover = self.config.get('cover', {})  
-        cover_name = cover.get('name', None)  
         image_files = [
             os.path.join(self.directory, f) for f in sorted(os.listdir(self.directory))
-            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.jfif', '.webp')) and not f.lower().startswith(cover_name or "cover")
+            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.jfif', '.webp')) and not f.lower().startswith("cover")
         ]
 
         if not image_files:
