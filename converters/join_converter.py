@@ -54,9 +54,11 @@ class JoinConverter(BaseConverter):
         console.print(f"Joined clip size: ↔{joined_clip.w} ↕{joined_clip.h} ")
 
         # Clean up temporary files after concatenation
+        
         # for file in temp_files:
         #     os.remove(file)
-        console.print("[blue]Temporary files cleaned up.[/blue]")
+        # console.print("[blue]Temporary files cleaned up.[/blue]")
+        metadata["temp_files"] = temp_files
 
         return [joined_clip]
 

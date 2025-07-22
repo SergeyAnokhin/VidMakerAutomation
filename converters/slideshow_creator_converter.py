@@ -52,6 +52,11 @@ class SlideshowCreatorConverter(BaseConverter):
 
         self.log.log("[green]🛠️ Overlaying slideshow onto existing clip.[/green]")
 
+        # if width (image_clips[0].w) smaller tahn 720 display big error
+        if image_clips[0].w < 720:
+            self.log.log("[red]❌ Image width is too small. Minimum width is 720 pixels.[/red]")
+            raise ValueError("Image width is too small. Minimum width is 720 pixels.")
+
         if clip.h != image_clips[0].h or clip.w != image_clips[0].w:
             original_clip_size = (clip.w, clip.h)
             self.log.log(f"[yellow]🔄 First image size ↔{image_clips[0].w} ↕{image_clips[0].h} pixels[/yellow]")

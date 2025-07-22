@@ -1,7 +1,9 @@
 from .base_converter import BaseConverter
-from moviepy.editor import CompositeVideoClip
+from rich.console import Console
 import os
 import time
+
+console = Console()
 
 class VideoExportConverter(BaseConverter):
     def convert(self, clip, metadata, index: int):
@@ -41,6 +43,12 @@ class VideoExportConverter(BaseConverter):
 
         # Export the video clip
         clip.write_videofile(output_path, fps=fps, codec=codec, preset=quality_preset, threads=4)
+
+        temp_files = metadata.get("temp_files", [])
+        for file in temp_files:
+            os.remove(file)
+        console.print("[blue]Temporary files cleaned up.[/blue]")
+
 
         clip.close()
         return clip

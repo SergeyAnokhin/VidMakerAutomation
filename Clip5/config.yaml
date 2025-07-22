@@ -11,10 +11,19 @@ video_quality: &quality
   preset: "medium" # all values: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
 fade: &fade 0.2
 image_duration: &image_duration 10
-image_height: &image_height 1024  
+cover_duration: &cover_duration 10
+image_height: &image_height 1080 # ❗ Change for Flux 2:3 images to 1080 (1248)  || 1024 
+# all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, 
+# COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, 
+# COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
+# https://docs.opencv.org/4.x/d3/d50/group__imgproc__colormap.html
+colormap: &colormap "COLORMAP_AUTUMN"
 crop: &crop
   # start_time: 0
-  # end_time: 10  # End of the audio
+  # end_time: 60  # End of the audio
+crop_short: &crop_short
+  start_time: 0
+  end_time: 135  # End of the audio
 
 tasks:
   - name: "Create Full Length Video"
@@ -23,7 +32,9 @@ tasks:
         config: *crop
       - type: "SlideshowCreatorConverter"
         config:
-          cover_name: cover        
+          cover:
+            name: cover_youtube
+            duration: *cover_duration
           slideshow:
             height: *image_height  # Height of the images to be unified
             duration: *image_duration
@@ -31,55 +42,15 @@ tasks:
             fade_in: *fade  # Fade-in duration in seconds
             fade_out: *fade  # Fade-out duration in seconds
             fade_in_first_image: false
-      # - type: "TextOverlayConverter"
-      #   config:
-      #     text: "Your life is Your life"
-      #     start_time: 1
-      #     end_time: 9
-      #     position:
-      #       # if in pixels, (0, 0) is top left
-      #       x: "center" # values: center, left, right
-      #       y: "bottom" # values: center, top, bottom
-      #     font:
-      #       name: "C:/Users/desktop/AppData/Local/Microsoft/Windows/Fonts/Roboto-Bold.ttf" # values: Arial, Times New Roman, Comic Sans MS, Courier New, Georgia, Impact, Lucida Sans Unicode, Palatino Linotype, Tahoma, Trebuchet MS, Verdana
-      #       size: 70
-      #       color: "white"
-      #     contour:
-      #       color: "black"
-      #       size: 2
-      #     transition:
-      #       fade_in: *fade
-      #       fade_out: *fade
-      - type: "ImageOverlayConverter"
-        config:
-          image:
-            path: "static/animated2.gif"
-            resize: 1
-            position:
-              x: "left" # values: left, center, right
-              y: "bottom" # values: top, center, bottom
-          timing:
-            start_time: -32
-            duration: 30
       - type: "SplitConverter"
         config:
           parts: 6
-      # - type: "ChannelBarsVisualizer"
-      #   config:
-      #     audio:
-      #       sample_rate: 48000
-      #     visualization:
-      #       fps: *default_fps
-      #       bar_height_scale: 1.0
-      #       bar_width: 20
-      #       spacing: 10
-      #       colormap: "COLORMAP_JET"  # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
       - type: "TwoSpotsVisualizationConverter"
         config:
           visualization:
             fps: *default_fps
-            # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-            colormap: "COLORMAP_JET" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
+            # OpenCV  https://docs.opencv.org/4.x/d3/d50/group__imgproc__colormap.html
+            colormap: *colormap
       - type: "JoinConverter"
         config: *quality
           # fps: *default_fps
@@ -94,46 +65,66 @@ tasks:
   # - name: "Create YouTube Short"
   #   converters:
   #     - type: "AudioReaderConverter"
-  #       config:
-  #         start_time: 8
-  #         end_time: 56  # Duration of 30 seconds
+  #       config: *crop_short
   #     - type: "SlideshowCreatorConverter"
   #       config:
   #         slideshow:
   #           height: *image_height  # Height for YouTube Short format
-  #           width: 600
+  #           width: 700
   #           ratio: crop # or resize 
   #         transition:
   #           fade_in: *fade  
   #           fade_out: *fade
-  #     - type: "ImageOverlayConverter"
-  #       config:
-  #         image:
-  #           path: "static/animated2.gif"
-  #           resize: 1
-  #           position:
-  #             x: "right" # values: left, center, right
-  #             y: "top" # values: top, center, bottom
-  #         timing:
-  #           start_time: -16
-  #           duration: 15    
-  #     # - type: "SplitConverter"
-  #     #   config:
-  #     #     parts: 6                    
   #     - type: "TwoSpotsVisualizationConverter"
   #       config:
-  #         audio:
-  #           sample_rate: 10000
   #         visualization:
   #           fps: *default_fps
-  #           # OpenCV  https://learnopencv.com/applycolormap-for-pseudocoloring-in-opencv-c-python/
-  #           colormap: "COLORMAP_AUTUMN" # all values: COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_JET, COLORMAP_WINTER, COLORMAP_RAINBOW, COLORMAP_OCEAN, COLORMAP_SUMMER, COLORMAP_SPRING, COLORMAP_COOL, COLORMAP_HSV, COLORMAP_PINK, COLORMAP_HOT, COLORMAP_PARULA, COLORMAP_MAGMA, COLORMAP_INFERNO, COLORMAP_PLASMA, COLORMAP_VIRIDIS, COLORMAP_CIVIDIS, COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_TURBO, COLORMAP_DEEPGREEN
-  #     # - type: "JoinConverter"
-  #     #   config: *quality
+  #           # OpenCV  https://docs.opencv.org/4.x/d3/d50/group__imgproc__colormap.html
+  #           colormap: *colormap
   #     - type: "VideoExportConverter"
   #       config:
-  #         output_file: "short_output.mp4"
+  #         output_file: "shorts.mp4"
   #         quality:
   #           fps: *default_fps
   #           codec: "libx264"
   #           quality_preset: "medium"
+
+  - name: "Create TikTok"
+    converters:
+      - type: "AudioReaderConverter"
+        config: *crop_short
+      - type: "SlideshowCreatorConverter"
+        config:
+          cover:
+            name: cover_tiktok
+            duration: *cover_duration
+          slideshow:
+            height: *image_height  # Height for YouTube Short format
+            width: 720 # 1024 / 16 * 9 => 576
+            ratio: crop # or resize 
+          transition:
+            fade_in: *fade  
+            fade_out: *fade
+      - type: "SplitConverter"
+        config:
+          parts: 6
+      - type: "TwoSpotsVisualizationConverter"
+        config:
+          visualization:
+            fps: *default_fps
+            # OpenCV  https://docs.opencv.org/4.x/d3/d50/group__imgproc__colormap.html
+            colormap: *colormap
+      - type: "JoinConverter"
+        config: *quality
+          # fps: *default_fps
+          # codec: "png" # all values: h264, hevc, mpeg4, vp8, vp9, libx264, libx265, libxvid, rawvideo, png
+          # preset: "medium" # all values: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+      - type: "AudioReaderConverter"
+        config: *crop_short
+      - type: "VideoExportConverter"
+        config:
+          output_file: "tiktok.mp4"
+          quality:
+            fps: *default_fps
+            codec: "libx264"
+            quality_preset: "medium"
